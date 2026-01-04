@@ -1,9 +1,9 @@
 import express from 'express'
-import env from 'dotenv'
+import 'dotenv/config'
 import mongoose from 'mongoose'
 
-env.config()
 const app = express()
+const PORT = process.env.PORT || 3000
 
 app.get('/', (req, res) => {
   res.send('Working on the Vet app')
