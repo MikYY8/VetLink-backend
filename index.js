@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 
 const app = express()
 const PORT = process.env.PORT || 3000
+const JWT_ACCESS = process.env.JWT_ACCESS
 
 app.get('/', (req, res) => {
   res.send('Working on the Vet app')
@@ -18,3 +19,4 @@ mongoose.connect(process.env.MONGOURL).then(()=>{
 app.listen(PORT, () => {
   console.log(`Running in http://localhost:${PORT}`)
 })
+
