@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
 import { Usuario } from "..model/userModel.js";
+import { Vet } from "../models/vetModel.js";
 
 export class userService {
     async registerUser (firstName, lastName, email, password) {
@@ -21,25 +22,59 @@ export class userService {
     };
 
     async loginUser (email, password) {
-        const userExists = await Usuario.findOne({ email });
-        if (!userExists) {
-            return res.status(401).json({ message: "Email o contraseña incorrectos" });
+        try{
+            const userExists = await Usuario.findOne({ email });
+            if (!userExists) {
+                return res.status(401).json({ message: "Email o contraseña incorrectos" });
+            }
+            const passwordValid = await bcrypt.compare(password, userExists.password);
+            if (!passwordValid) {
+                return res.status(401).json({ message: "Email o contraseña incorrectos" });
+            }
+            const accesstoken = generateAccessToken({
+                id: userExists._id,
+                email: userExists.email,
+                role: userExists.role,
+            });
+            const refreshtoken = generateRefreshToken({
+                id: userExists._id,
+                email: userExists.email,
+                role: userExists.role,
+            });
+            return { accesstoken, refreshtoken };
+
+        }catch(error) {
+            res.status(500).json({ message: error.message });
         }
-        const passwordValid = await bcrypt.compare(password, user.password);
-        if (!passwordValid) {
-            return res.status(401).json({ message: "Email o contraseña incorrectos" });
+    };
+
+    async loginVet (email, password) {
+        try{
+            const vetExists = await Vet.findOne({ email });
+            if (!vetExists) {
+                return res.status(401).json({ message: "Email o contraseña incorrectos" });
+            }
+
+            const passwordValid = await bcrypt.compare(password, vetExists.password);
+            if (!passwordValid) {
+                return res.status(401).json({ message: "Email o contraseña incorrectos" });
+            }
+
+            const accesstoken = generateAccessToken({
+                id: vetExists._id,
+                email: vetExists.email,
+                role: vetExists.role,
+            });
+            const refreshtoken = generateRefreshToken({
+                id: vetExists._id,
+                email: vetExists.email,
+                role: vetExists.role,
+            });
+            return { accesstoken, refreshtoken };
+
+        }catch(error) {
+            res.status(500).json({ message: error.message });
         }
-        const accesstoken = generateAccessToken({
-            id: user._id,
-            email: user.email,
-            role: user.role,
-        });
-        const refreshtoken = generateRefreshToken({
-            id: user._id,
-            email: user.email,
-            role: user.role,
-        });
-        return { accesstoken, refreshtoken };
     };
 
     async renovateAccessToken(refreshtoken) {

@@ -34,6 +34,24 @@ export const loginController = async (req, res) => {
     }
 };
 
+export const loginVetController = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const { accesstoken, refreshtoken } = await us.loginVet(email, password);
+        res.set({
+            Authorization: `Bearer ${accesstoken}`,
+            "x-refresh-token": refreshtoken,
+        });
+        res.status(200).json({
+            mensage: "success",
+            code: 200,
+            data: { accesstoken, refreshtoken },
+        });
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+};
+
 export const renovateTokenController = async (req, res) => {
     try {
         const refreshtoken = req.headers["x-refresh-token"];
