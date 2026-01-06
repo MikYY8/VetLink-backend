@@ -1,35 +1,40 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
-import { Usuario } from "..model/userModel.js";
-import { Vet } from "../models/vetModel.js";
+import Usuario from "../models/userModel.js"
+import Vet from "../models/vetModel.js";
 
 export class userService {
     async registerUser (firstName, lastName, email, password) {
-        try{
-            const existingUser = await Usuario.findOne({ email });
-            if(existingUser){
-                return res.status(400).json({ message: "E-mail ya registrado" });
-            }
-
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = await Usuario.create({firstName, lastName, email, password: hashedPassword});
-            res.status(201).json({ message: "Usuario creado con éxito" });
-            return newUser;
-        }catch(error) {
-            res.status(500).json({ message: error.message });
+        const existingUser = await Usuario.findOne({ email });
+        if(existingUser){
+            throw new Error("E-mail ya registrado");
         }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = await Usuario.create({firstName, lastName, email, password : hashedPassword});
+        return newUser;
     };
+
+    async registerVet (firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations){
+        const existingVet = await Vet.findOne({ email });
+        if(existingVet){
+            throw new Error("E-mail ya registrado");
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newVet = await Vet.create({ firstName, lastName, email, password : hashedPassword, licenseNumber, specialty, acceptsConsultations })
+        return newVet;
+    }
 
     async loginUser (email, password) {
         try{
             const userExists = await Usuario.findOne({ email });
             if (!userExists) {
-                return res.status(401).json({ message: "Email o contraseña incorrectos" });
+                throw new Error("Email o contraseña incorrectos");
             }
             const passwordValid = await bcrypt.compare(password, userExists.password);
             if (!passwordValid) {
-                return res.status(401).json({ message: "Email o contraseña incorrectos" });
+                throw new Error("Email o contraseña incorrectos");
             }
             const accesstoken = generateAccessToken({
                 id: userExists._id,
@@ -44,7 +49,7 @@ export class userService {
             return { accesstoken, refreshtoken };
 
         }catch(error) {
-            res.status(500).json({ message: error.message });
+            throw new Error(error);
         }
     };
 
@@ -52,12 +57,12 @@ export class userService {
         try{
             const vetExists = await Vet.findOne({ email });
             if (!vetExists) {
-                return res.status(401).json({ message: "Email o contraseña incorrectos" });
+                throw new Error("Email o contraseña incorrectos");
             }
 
             const passwordValid = await bcrypt.compare(password, vetExists.password);
             if (!passwordValid) {
-                return res.status(401).json({ message: "Email o contraseña incorrectos" });
+                throw new Error("Email o contraseña incorrectos");
             }
 
             const accesstoken = generateAccessToken({
@@ -73,7 +78,7 @@ export class userService {
             return { accesstoken, refreshtoken };
 
         }catch(error) {
-            res.status(500).json({ message: error.message });
+            throw new Error(error);
         }
     };
 
@@ -81,9 +86,9 @@ export class userService {
         const payload = jwt.verify(refreshtoken, process.env.JWT_REFRESH);
         const user = await Usuario.findById(payload.id);
         if (!user) {
-            return res.status(401).json({ message: "No se encontró el usuario" });
+            throw new Error({ message: "No se encontró el usuario" });
         }
-        const accesstoken = generarAccessToken({id: user._id, email: user.email, role: user.role,});
+        const accesstoken = generateAccessToken({id: user._id, email: user.email, role: user.role,});
         return accesstoken
     }
 
