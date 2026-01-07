@@ -19,8 +19,8 @@ export const registerController = async (req, res) => {
 
 export const registerVetController = async (req, res) => {
     try{
-        const { firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations } = req.body;
-        const newVet = await us.registerVet(firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations);
+        const { firstName, lastName, email, password, licenseNumber, specialty, workSchedule, acceptsConsultations } = req.body;
+        const newVet = await us.registerVet(firstName, lastName, email, password, licenseNumber, specialty, workSchedule, acceptsConsultations);
         
         res.status(201).json({
           message: "Success",
