@@ -16,7 +16,7 @@ export const authVetMiddleware = (req, res, next) => {
       return res.status(403).json({ message: "Acceso restringido a veterinarios" });
     }
 
-    req.vet = decoded; // { id, role }
+    req.user = decoded; // { id, role }
     next();
   } catch (error) {
     return res.status(401).json({ message: "Token inválido" });
