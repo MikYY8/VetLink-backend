@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import cors from "cors"
 
 import userRouter from "./src/routes/userRoutes.js"
+import vetRoutes from "./src/routes/vetRoutes.js";
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -23,6 +24,8 @@ app.get('/', (req, res) => {
 })
 
 app.use("/api/users", userRouter)
+app.use("/vets", vetRoutes);
+
 
 mongoose.connect(process.env.MONGOURL).then(()=>{
   console.log("Base de datos conectada a " + process.env.MONGOURL)
