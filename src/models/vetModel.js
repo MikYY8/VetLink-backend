@@ -48,6 +48,10 @@ const vetSchema = new mongoose.Schema({
     photoUrl: {
         type: String,
     },
+    workSchedule: {
+        start: { type: String }, // "09:00"
+        end: { type: String },   // "17:00"
+    },
     role: {
       type: String,
       enum: ["VET"],

@@ -16,13 +16,13 @@ export class userService {
         return newUser;
     };
 
-    async registerVet (firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations){
+    async registerVet (firstName, lastName, email, password, licenseNumber, specialty, workSchedule, acceptsConsultations){
         const existingVet = await Vet.findOne({ email });
         if(existingVet){
             throw new Error("E-mail ya registrado");
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newVet = await Vet.create({ firstName, lastName, email, password : hashedPassword, licenseNumber, specialty, acceptsConsultations })
+        const newVet = await Vet.create({ firstName, lastName, email, password : hashedPassword, licenseNumber, specialty, workSchedule, acceptsConsultations })
         return newVet;
     }
 
@@ -86,7 +86,7 @@ export class userService {
         const payload = jwt.verify(refreshtoken, process.env.JWT_REFRESH);
         const user = await Usuario.findById(payload.id);
         if (!user) {
-            throw new Error({ message: "No se encontró el usuario" });
+            throw new Error("No se encontró el usuario");
         }
         const accesstoken = generateAccessToken({id: user._id, email: user.email, role: user.role,});
         return accesstoken
