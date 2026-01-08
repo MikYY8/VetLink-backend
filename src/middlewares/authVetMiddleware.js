@@ -13,7 +13,7 @@ export const authVetMiddleware = (req, res, next) => {
 
   try{
     const decoded = jwt.verify(token, process.env.JWT_ACCESS);
-    if (decoded.role !== "VET") {
+    if (decoded.role !== "VET" || decoded.role !== "ADMIN") {
       return res.status(403).json({ message: "Acceso restringido a veterinarios" });
     };
 

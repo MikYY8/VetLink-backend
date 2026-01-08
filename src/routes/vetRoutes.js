@@ -7,12 +7,12 @@ import { authVetMiddleware } from "../middlewares/authVetMiddleware.js";
 const router = express.Router();
 
 // Veterinario puede ver su perfil
-router.get("/me", authMiddleware, authVetMiddleware, getVetProfile);
+router.get("/me", authMiddleware, authVetMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "VET"]), getVetProfile);
 
 // Veterinario puede editar su perfil
-router.put("/me", authMiddleware, authVetMiddleware, authRolesMiddleware, updateVetProfile);
+router.put("/me", authMiddleware, authVetMiddleware, authRolesMiddleware(["ADMIN", "VET"]), updateVetProfile);
 
 // Veterinario puede ver sus turnos
-router.get("/:id/availability", authVetMiddleware, getVetAgenda);
+router.get("/:id/availability", authVetMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "VET"]), getVetAgenda);
 
 export default router;
