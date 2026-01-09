@@ -3,8 +3,9 @@ import Pet from "../models/petModel.js"
 
 export class petService {
     
-    async getPetsByOwner() {
-
+        // OBTENER MASCOTAS POR DUEÑO
+    async getPetsByOwner(ownerId) {
+        return await Pet.find({ owner: ownerId }); // busca owner por su Id
     };
 
         // CREAR MASCOTA
@@ -14,7 +15,6 @@ export class petService {
         const newPet = await Pet.create({name, age, sex, species, breed, color, isNeutered, photoUrl});
         return newPet;
     };
-
 
         // EDITAR MASCOTA
     async updatePet(petId, updateData, user) {
@@ -31,7 +31,6 @@ export class petService {
 
         Object.assign(pet, updateData);
         await pet.save();
-
         return pet;
     };
 
@@ -48,9 +47,4 @@ export class petService {
 
         await pet.deleteOne();
     };
-
-
-
-
-
 };
