@@ -3,6 +3,7 @@ import Vet from "../models/vetModel.js";
 
 // const vs = new vetService();
 
+    // VER PERFIL DEL VETERINARIO
 export const getVetProfile = async (req, res) => {
   try{
     const vetId = req.user.id;
@@ -20,6 +21,7 @@ export const getVetProfile = async (req, res) => {
   }
 };
 
+    // ACTUALIZAR DATOS DEL VETERINARIO
 export const updateVetProfile = async (req, res) => {
     try{
         const vetId = req.user.id;
@@ -56,6 +58,7 @@ export const updateVetProfile = async (req, res) => {
     }
 };
 
+    // TURNOS DEL VETERINARIO (AGENDA)
 export const getVetAgenda = async (req, res) => {
     try{
         const { id } = req.params;
