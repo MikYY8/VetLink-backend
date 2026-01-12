@@ -1,24 +1,31 @@
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
-import Pet from "../models/petModel.js"
+import Mascota from "../models/petModel.js"
 
 export class petService {
     
-    async getPetsByOwner() {
+        // OBTENER MASCOTAS POR DUEÑO
+    async getAllPets(ownerId) {
+        const pets = await Mascota.find({ owner : ownerId });  // busca owner por su Id
+        return pets
+    };
 
+    async getPetDetails(petId){
+        const pet = await Mascota.findById(petId);
+        return pet 
     };
 
         // CREAR MASCOTA
-    async createPet(name, age, sex, species, breed, color, isNeutered, photoUrl) {
-        // y como hago para verificar si esta mascota ya esta registrada? 
-        // No soy responsable de los errores de la capa 8 xD COMO VAS A AGREGAR A TU MASCOTA DOS VECES GGGGGGGGGGGGGGGGGGG
-        const newPet = await Pet.create({name, age, sex, species, breed, color, isNeutered, photoUrl});
-        return newPet;
-    };
-
+    async createPet(petData, ownerId) {
+        const newPet = await Mascota.create({
+            ...petData,
+            owner: ownerId,
+        });
+    return newPet;
+    }
 
         // EDITAR MASCOTA
     async updatePet(petId, updateData, user) {
-        const pet = await Pet.findById(petId);
+        const pet = await Mascota.findById(petId);
 
         if (!pet) {
             throw new Error("Mascota no encontrada");
@@ -31,12 +38,12 @@ export class petService {
 
         Object.assign(pet, updateData);
         await pet.save();
-
         return pet;
     };
 
+        // ELIMINAR MASCOTA
     async deletePet(petId, user) {
-        const pet = await Pet.findById(petId);
+        const pet = await Mascota.findById(petId);
 
         if (!pet) {
             throw new Error("Mascota no encontrada");
@@ -48,9 +55,4 @@ export class petService {
 
         await pet.deleteOne();
     };
-
-
-
-
-
 };

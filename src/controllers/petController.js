@@ -1,14 +1,12 @@
 import { petService } from "../services/petService.js"
-import { Pet } from "../models/petModel.js"
 
 const ps = new petService();
 
     // VER TODAS LAS MASCOTAS del owner
 export const getAllPetsController = async (req, res) => {
   try {
-    const ownerId = req.user.id;    // encontrar el id del owner
-
-    const pets = await ps.getPetsByOwner(ownerId);  // a una const, le paso los datos de la funcion, y la id del owner
+    const ownerId = req.params.ownerId;     // extraer del req los parametros 
+    const pets = await ps.getAllPets(ownerId); // pedir al service que encuentre las mascotas del owner con ese id
 
     res.status(200).json({
       message: "Mascotas obtenidas",
@@ -22,8 +20,8 @@ export const getAllPetsController = async (req, res) => {
     // VER DETALLES DE LA MASCOTA
 export const getPetDetailsController = async (req, res) => {
   try{
-    const petId = req.pet.id;   // busco la id de la mascota
-    const pet = await Pet.findById(petId)   // pregunto a Mongo si encuentra los DATOS de un Pet con ese Id
+    const { petId } = req.params;    // busco la id de la mascota
+    const pet = await ps.getPetDetails(petId)   // pregunto a Mongo si encuentra los DATOS de un Pet con ese Id
     if (!pet) {
       return res.status(404).json({ message: "Mascota no encontrada" });
     }
@@ -40,16 +38,20 @@ export const getPetDetailsController = async (req, res) => {
     // CREAR NUEVA MASCOTA
 export const createPetController = async (req, res) => {
   try {
-    const ownerId = req.user.id; // owner desde el token
+    const ownerId =
+      req.user.role === "OWNER"
+        ? req.user.id
+        : req.body.ownerId;
+        console.log(ownerId)
     const petData = req.body;    // body del request, es decir, datos ingresados y procesados por el service
-
+    console.log(petData)
     const newPet = await ps.createPet(petData, ownerId);
 
     res.status(201).json({
       message: "Mascota creada con éxito",
       data: newPet,
     });
-  } catch (error) {
+  }catch(error){
     res.status(400).json({ message: error.message });
   }
 };
@@ -71,7 +73,7 @@ export const updatePetController = async (req, res) => {
       message: "Mascota actualizada",
       data: updatedPet,
     });
-  } catch (error) {
+  }catch(error){
     res.status(403).json({ message: error.message });
   }
 };
@@ -80,14 +82,14 @@ export const updatePetController = async (req, res) => {
 export const deletePetController = async (req, res) => {
   try {
     const { petId } = req.params; 
-    const user = req.user; // por qué aca usamos req.user y no const ownerId = req.user.id;
+    const user = req.user; 
 
     await ps.deletePet(petId, user);
 
     res.status(200).json({
       message: "Mascota eliminada",
     });
-  } catch (error) {
+  }catch(error){
     res.status(403).json({ message: error.message });
   }
 };

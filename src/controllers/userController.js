@@ -4,8 +4,8 @@ const us = new userService();
 
 export const registerController = async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
-    const newUser = await us.registerUser(firstName, lastName, email, password);
+    const { firstName, lastName, email, password, role } = req.body; 
+    const newUser = await us.registerUser(firstName, lastName, email, password, role);
 
     res.status(201).json({
       message: "Success",

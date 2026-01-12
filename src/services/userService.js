@@ -5,14 +5,14 @@ import Usuario from "../models/userModel.js"
 import Vet from "../models/vetModel.js";
 
 export class userService {
-    async registerUser (firstName, lastName, email, password) {
+    async registerUser (firstName, lastName, email, password, role) {
         const existingUser = await Usuario.findOne({ email });
         if(existingUser){
             throw new Error("E-mail ya registrado");
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await Usuario.create({firstName, lastName, email, password : hashedPassword});
+        const newUser = await Usuario.create({firstName, lastName, email, password : hashedPassword, role});
         return newUser;
     };
 
