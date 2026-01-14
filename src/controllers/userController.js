@@ -30,36 +30,17 @@ export const registerVetController = async (req, res) => {
           message: "Success",
           code: 201,
           data: newVet,
-    });
+        });
     }catch (error) {
         res.status(400).json({ message: error.message });
     };
 };
 
     // LOGIN DE USUARIOS (OWNER, SECRETARY, ADMIN)
-export const loginUserController = async (req, res) => {
+export const loginController = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const { accesstoken, refreshtoken } = await us.loginUser(email, password);
-        res.set({
-            Authorization: `Bearer ${accesstoken}`,
-            "x-refresh-token": refreshtoken,
-        });
-        res.status(200).json({
-            mensage: "success",
-            code: 200,
-            data: { accesstoken, refreshtoken },
-        });
-    } catch (error) {
-        res.status(401).json(error.message);
-    }
-};
-
-    // LOGIN DE VETERINARIOS (   A REFACTORIZAR, COMING SOON   )
-export const loginVetController = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const { accesstoken, refreshtoken } = await us.loginVet(email, password);
+        const { accesstoken, refreshtoken } = await us.login(email, password);
         res.set({
             Authorization: `Bearer ${accesstoken}`,
             "x-refresh-token": refreshtoken,
