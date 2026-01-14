@@ -1,10 +1,10 @@
 import express from "express";
-import { registerController, registerVetController, 
-        loginController, loginVetController, 
-        renovateTokenController, getAllUsersController,
-        getAllVetsController, 
-        updateUserController, deleteUserController,
-        updateVetController, deleteVetController
+import { registerUserController, registerVetController, 
+        loginUserController, loginVetController, 
+                renovateTokenController, 
+        getAllUsersController, getAllVetsController, 
+        updateUserController, updateVetController,
+        deleteUserController, deleteVetController
          } from "../controllers/userController.js"
 import { registerValidation, loginValidation } from "../validations/userValidation.js";
 import { validationMiddleware } from "../middlewares/validationMiddleware.js";
@@ -14,13 +14,13 @@ import { authMiddleware } from "../middlewares/authMiddleware.js";
 const userRouter = express.Router();
 
 // Registrar usuario (OWNER por defecto)
-userRouter.post("/register", registerValidation, validationMiddleware, registerController);
+userRouter.post("/register", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), registerValidation, validationMiddleware, registerUserController);
 
 // Registrar Veterinario
-userRouter.post("/vet/register", registerValidation, validationMiddleware, registerVetController);
+userRouter.post("/vet/register", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), registerValidation, validationMiddleware, registerVetController);
 
 // Login usuario (OWNER, SECRETARY)
-userRouter.post("/login", loginValidation, validationMiddleware, loginController);
+userRouter.post("/login", loginValidation, validationMiddleware, loginUserController);
 
 // Login Veterinario (mismas credenciales de un usuario normal)
 // (es posible que termine refactorizando este, porque no tiene mucho sentido ...
