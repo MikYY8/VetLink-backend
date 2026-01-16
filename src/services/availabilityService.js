@@ -1,9 +1,10 @@
-import Appointment from "../models/AppointmentModel.js";
-import AvailabilityBlock from "../models/AvailabilityBlockModel.js";
-import Vet from "../models/vetModel.js";
+import Turno from "../models/AppointmentModel.js";
+import BloqueDisponible from "../models/AvailabilityBlockModel.js";
+import Veterinario from "../models/vetModel.js";
 
 const TURN_DURATION = 20;
 
+    // Crear bloques de tiempo, para los turnos
 const generateTimeBlocks = (start, end) => {
     const blocks = [];
     let current = start;
@@ -19,8 +20,9 @@ const generateTimeBlocks = (start, end) => {
     return blocks;
 };
 
+    // Generar bloques de disponibilidad en base a los horarios del veterinario
 export const getVetAvailability = async (vetId, date) => {
-    const vet = await Vet.findById(vetId);
+    const vet = await Veterinario.findById(vetId);
     if (!vet) 
         {throw new Error("Veterinario no encontrado")
     };
@@ -30,13 +32,13 @@ export const getVetAvailability = async (vetId, date) => {
         vet.workSchedule.end
     );
 
-    const appointments = await Appointment.find({
+    const appointments = await Turno.find({
         vet: vetId,
         date,
         status: "SCHEDULED",
     });
 
-    const blocked = await AvailabilityBlock.find({ vet: vetId, date });
+    const blocked = await BloqueDisponible.find({ vet: vetId, date });
 
     const unavailableTimes = [
         ...appointments.map((a) => a.time),

@@ -12,7 +12,7 @@ router.get("/me", authMiddleware, authVetMiddleware, authRolesMiddleware(["ADMIN
 // Veterinario puede editar su perfil
 router.put("/me", authMiddleware, authVetMiddleware, authRolesMiddleware(["ADMIN", "VET"]), updateVetProfile);
 
-// Veterinario puede ver sus turnos
-router.get("/:id/availability", authVetMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "VET"]), getVetAgenda);
+// Veterinario puede ver su agenda de turnos
+router.get("/agenda/", authVetMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "VET"]), getVetAgenda);
 
 export default router;
