@@ -6,6 +6,7 @@ import cors from "cors"
 import userRouter from "./src/routes/userRoutes.js"
 import vetRoutes from "./src/routes/vetRoutes.js";
 import ownerRoutes from "./src/routes/ownerRoutes.js"
+import appointmentRoutes from "./src/routes/appointmentRoutes.js"
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -27,6 +28,7 @@ app.get('/', (req, res) => {
 app.use("/users", userRouter);
 app.use("/vets", vetRoutes);
 app.use("/owner", ownerRoutes);
+app.use("/appointment", appointmentRoutes);
 
 
 mongoose.connect(process.env.MONGOURL).then(()=>{
