@@ -10,6 +10,13 @@ export const registerUserController = async (req, res) => {
     const { firstName, lastName, email, password, role } = req.body; 
     const newUser = await us.registerUser(firstName, lastName, email, password, role);
 
+        // 🔒 BLOQUEO DE ROLES
+    if (req.user.role === "SECRETARY" && role === "ADMIN") {
+      return res.status(403).json({
+        message: "No tenés permisos para crear administradores",
+      });
+    }
+
     res.status(201).json({
       message: "Success",
       code: 201,
@@ -108,6 +115,12 @@ export const updateUserController = async (req, res) => {
         const { ownerId } = req.params;
         const user = await Usuario.find({ownerId})
         const updateData = req.body;
+    // 🔒 BLOQUEO DE ROLES
+        if (req.user.role === "SECRETARY" && ownerId.role === "ADMIN") {
+            return res.status(403).json({
+                message: "No tenés permisos para editar administradores",
+            });
+        };
 
         const updatedUser = await us.updateUser(ownerId, updateData, user); 
         res.status(200).json({
