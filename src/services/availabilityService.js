@@ -20,7 +20,6 @@ const generateTimeBlocks = (start, end) => {
     return blocks;
 };
 
-
     // GENERAR bloques de disponibilidad en base a los horarios del veterinario
 export const generateBlocksForVet = async (vetId, date) => {
     const vet = await Veterinario.findById(vetId);
@@ -39,14 +38,13 @@ export const generateBlocksForVet = async (vetId, date) => {
         status: "SCHEDULED",
     });
 
-    const blocked = await BloqueDisponible.find({ vet: vetId, date });
+    const blocked = await BloqueDisponible.find({ vet: vetId, date, available: false });
 
     const unavailableTimes = [
         ...appointments.map((a) => a.time),
         ...blocked.map((b) => b.time),
     ];
 
-    const allBlocksAvailable = allBlocks.filter((t) => !unavailableTimes.includes(t));
-    console.log(allBlocksAvailable)
-    return allBlocksAvailable
+    return allBlocks.filter(t => !unavailableTimes.includes(t));
 };
+

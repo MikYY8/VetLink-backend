@@ -24,11 +24,21 @@ export class appointmentService {
     };
 
         // CREAR BLOQUES DE DISPONIBILIDAD POR VET
-    async getVetAvailability (vetId) {
-        const vet = await Veterinario.findById(vetId);
-        if (!vet) throw new Error("Veterinario no encontrado");
-        const blocks = generateBlocksForVet(allBlocksAvailable);
-        return await AvailabilityBlock.insertMany(blocks);
+    async getVetAvailability ( vetId, date ) {
+        const blocks = await generateBlocksForVet( vetId, date );
+
+        console.log(blocks)
+
+        const allBlocks = blocks.map(time => ({
+            vet: vetId,
+            date,
+            time,
+            available: true,
+        }));
+
+        console.log(allBlocks)
+        
+        return await BloqueDisponible.insertMany(allBlocks);
     };
 
     

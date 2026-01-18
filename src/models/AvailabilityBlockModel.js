@@ -17,7 +17,7 @@ const availabilityBlockSchema = new mongoose.Schema(
     },
     reason: {
       type: String,
-      default: "Bloqueado",
+      default: "Disponible",
     },
   },
   { timestamps: true }

@@ -29,12 +29,15 @@ export const getAvailableAppointmentsController = async (req, res) => {
 export const generateAvailabilityController = async (req, res) => {
   try {
     const { vetId } = req.params;
-    // const { startDate, endDate } = req.body;
+    const { date } = req.body;
+
+    if (!date) {
+      return res.status(400).json({ message: "La fecha es obligatoria" });
+    }
 
     const blocks = await as.getVetAvailability(
       vetId,
-      // startDate,
-      // endDate
+      date
     );
 
     res.status(201).json({
