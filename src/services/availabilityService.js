@@ -1,5 +1,5 @@
-import Turno from "../models/AppointmentModel.js";
-import BloqueDisponible from "../models/AvailabilityBlockModel.js";
+import Turno from "../models/appointmentModel.js";
+import BloqueDisponible from "../models/availabilityBlockModel.js";
 import Veterinario from "../models/vetModel.js";
 
 const TURN_DURATION = 20;

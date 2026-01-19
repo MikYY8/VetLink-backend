@@ -8,20 +8,22 @@ const us = new userService();
 export const registerUserController = async (req, res) => {
   try {
     const { firstName, lastName, email, password, role } = req.body; 
-    const newUser = await us.registerUser(firstName, lastName, email, password, role);
 
-        // 🔒 BLOQUEO DE ROLES
+        // BLOQUEO DE ROLES
     if (req.user.role === "SECRETARY" && role === "ADMIN") {
-      return res.status(403).json({
+        return res.status(403).json({
         message: "No tenés permisos para crear administradores",
       });
-    }
+    }else{
+        const newUser = await us.registerUser(firstName, lastName, email, password, role);
+        
+        res.status(201).json({
+        message: "Success",
+        code: 201,
+        data: newUser,
+        })  
+    };
 
-    res.status(201).json({
-      message: "Success",
-      code: 201,
-      data: newUser,
-    });
     }catch(error){
         res.status(400).json({ message: error.message });
     };

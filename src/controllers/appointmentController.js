@@ -48,3 +48,29 @@ export const generateAvailabilityController = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+  // CREAR TURNOOOOOOOOOOOOO
+export const createAppointmentController = async (req, res) => {
+  try {
+    const ownerId =
+      req.user.role === "OWNER"
+        ? req.user.id        // si el owner saca el turno, su id viene del token
+        : req.body.ownerId;  // si no, se pide en el body del request
+
+    const appointment = await as.createAppointment({
+      ...req.body,
+      ownerId,
+    });
+
+    res.status(201).json({
+      message: "Turno reservado con éxito",
+      data: appointment,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
+
+

@@ -4,6 +4,7 @@ import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js" // (
 
 import { getAvailableAppointmentsController, 
         generateAvailabilityController,
+        createAppointmentController,
                 // getVetAppointmentsController,
                 // getAllAppointmentsController,
         } from "../controllers/appointmentController.js";
@@ -11,12 +12,19 @@ import { getAvailableAppointmentsController,
 const appointmentRouter = express.Router();
 
 // Turnos disponibles (PARA OWNERS / SECRETARIES / ADMINS)
-appointmentRouter.get("/available", getAvailableAppointmentsController);
-        // authMiddleware, authRolesMiddleware(["OWNER", "SECRETARY", "ADMIN"]),
-          
+appointmentRouter.get("/available", authMiddleware, authRolesMiddleware(["OWNER", "SECRETARY", "ADMIN"]), getAvailableAppointmentsController);
 
         // PARA TESTEO, generar bloques de disponibilidad por veterinario
 appointmentRouter.post("/availability/generate/:vetId", generateAvailabilityController)
+
+// Crear turno (PARA OWNERS / SECRETARIES / ADMINS)
+appointmentRouter.post("/make-appointment", authMiddleware, authRolesMiddleware(["OWNER", "SECRETARY", "ADMIN"]), createAppointmentController);
+
+
+
+
+
+
 
 
 // // Turnos programados (PARA VETS)
