@@ -5,6 +5,7 @@ import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js" // (
 import { getAvailableAppointmentsController, 
         generateAvailabilityController,
         createAppointmentController,
+        cancelAppointmentController,
                 // getVetAppointmentsController,
                 // getAllAppointmentsController,
         } from "../controllers/appointmentController.js";
@@ -20,6 +21,8 @@ appointmentRouter.post("/availability/generate/:vetId", generateAvailabilityCont
 // Crear turno (PARA OWNERS / SECRETARIES / ADMINS)
 appointmentRouter.post("/make-appointment", authMiddleware, authRolesMiddleware(["OWNER", "SECRETARY", "ADMIN"]), createAppointmentController);
 
+// Cancelar turno (PARA OWNERS / SECRETARIES / ADMINS)
+appointmentRouter.delete("/cancel/:appointmentId", authMiddleware, authRolesMiddleware(["OWNER", "VET", "SECRETARY", "ADMIN"]), cancelAppointmentController);
 
 
 

@@ -71,6 +71,26 @@ export const createAppointmentController = async (req, res) => {
   }
 };
 
+export const cancelAppointmentController = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+    const userId = req.user.id;
+    const role = req.user.role;
+
+    const result = await as.cancelAppointment(
+      appointmentId,
+      userId,
+      role
+    );
+
+    res.json({
+      message: "Turno cancelado correctamente",
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 
 

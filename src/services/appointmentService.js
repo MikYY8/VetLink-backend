@@ -1,6 +1,7 @@
 import BloqueDisponible from "../models/availabilityBlockModel.js";
 import Veterinario from "../models/vetModel.js";
 import Turno from "../models/appointmentModel.js"
+import Mascota from "../models/petModel.js"
 
 import { generateBlocksForVet } from "../services/availabilityService.js"
 
@@ -26,8 +27,8 @@ export class appointmentService {
     };
 
         // CREAR BLOQUES DE DISPONIBILIDAD POR VET
-    async getVetAvailability ( vetId, date ) {
-        const blocks = await generateBlocksForVet( vetId, date );
+    async getVetAvailability (vetId, date) {
+        const blocks = await generateBlocksForVet(vetId, date);
 
         const allBlocks = blocks.map(time => ({
             vet: vetId,
@@ -42,28 +43,13 @@ export class appointmentService {
         // CREAR TURNO (POR FIN QUE EMOCION)
     async createAppointment({ petId, vetId, ownerId, date, time, type, details }) {
 
-        // VERIFICACION 1.1 Valida pet
-        const pet = await Mascota.findById(petId);
-        if (!pet) {
-            throw new Error("Mascota no encontrada");
-        }
-
-        // VERIFICACION 1.2 Validar ownership
-        if (userRole === "OWNER") {
-            if (pet.owner.toString() !== ownerId.toString()) {
-            throw new Error("No tenés permiso para sacar turno para esta mascota");
-            }
-        }
-
-        //  VERIFICACION 2: Verificar bloque disponible
+        //  VERIFICACION 1: Verificar bloque disponible
         const block = await BloqueDisponible.findOne({
             vet: vetId,
             date,
             time,
             available: true,
         });
-        
-        console.log("Bloque: " + block)
 
         if (!block) throw new Error("El turno ya no está disponible");
         
@@ -79,13 +65,56 @@ export class appointmentService {
             price: 100,
             status: "SCHEDULED",
         });
-        console.log("-------------------------")
-        console.log("Turno: " + appointment)
 
-        // VERIFICACION 3: Bloquear disponibilidad
+        // VERIFICACION 2: Bloquear disponibilidad
         block.available = false;
         block.reason = "Turno reservado"
         await block.save();
+
+        return appointment;
+    };
+
+    async cancelAppointment(appointmentId, userId, role) {
+        const appointment = await Turno.findById(appointmentId);
+
+        if (!appointment) throw new Error("Turno no encontrado");
+
+        // Permisos
+        if (role === "OWNER") {
+            if (appointment.owner.toString() !== userId.toString()) {
+            throw new Error("No tenés permiso para cancelar este turno");
+            };
+        };
+        // !!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!!!! UNTESTED !!!!!!!  aca no se si va a funcionar porque Vet no es un User .....
+        // !!!!!!!!!!!!!!!!!!!!!!!!!
+        if (role === "VET") {
+            if (appointment.vet.toString() !== userId.toString()) {
+            throw new Error("No tenés permiso para cancelar este turno");
+            };
+        };
+
+        // Validación por si ya está cancelado
+        if (appointment.status === "CANCELLED") {
+            throw new Error("El turno ya está cancelado");
+        };
+
+        // Cancelar turno
+        appointment.status = "CANCELLED";
+        await appointment.save();
+
+        // Liberar bloque 
+        const block = await BloqueDisponible.findOne({
+            vet: appointment.vet,
+            date: appointment.date,
+            time: appointment.time,
+        });
+
+        if (block) {
+            block.available = true;
+            block.reason = "Disponible"
+            await block.save();
+        };
 
         return appointment;
     };
