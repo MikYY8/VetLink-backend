@@ -1,4 +1,4 @@
-import { getVetAvailability } from "../services/availabilityService.js";
+import { generateBlocksForVet } from "../services/availabilityService.js";
 import Vet from "../models/vetModel.js";
 
 // const vs = new vetService();
@@ -64,7 +64,7 @@ export const getVetAgenda = async (req, res) => {
         const { id } = req.params;
         const { date } = req.query;
 
-        const availableSlots = await getVetAvailability(id, date);
+        const availableSlots = await generateBlocksForVet(id, date);
 
         res.status(200).json({
             vetId: id,

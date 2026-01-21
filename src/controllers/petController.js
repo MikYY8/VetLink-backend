@@ -5,7 +5,12 @@ const ps = new petService();
     // VER TODAS LAS MASCOTAS del owner
 export const getAllPetsController = async (req, res) => {
   try {
-    const ownerId = req.params.ownerId;     // extraer del req los parametros 
+      const ownerId =
+      req.user.role === "OWNER"
+        ? req.user.id
+        : req.body.ownerId;
+
+    // const ownerId = req.params.ownerId;     // extraer del req los parametros 
     const pets = await ps.getAllPets(ownerId); // pedir al service que encuentre las mascotas del owner con ese id
 
     res.status(200).json({

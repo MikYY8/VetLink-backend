@@ -16,8 +16,12 @@ const appointmentSchema = new mongoose.Schema({
         ref: "Vet",
         required: true,
     },
-    startTime: {
+    date: {
         type: Date,
+        required: true,
+    },
+    time: {
+        type: String,
         required: true,
     },
     type: {
