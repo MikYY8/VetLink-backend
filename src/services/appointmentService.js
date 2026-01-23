@@ -141,9 +141,54 @@ export class appointmentService {
         .populate("pet", "name species")     // popular datos útiles
         .populate("owner", "firstName lastName")
         .sort({ date: 1, time: 1 });
-        
+
         return agenda;
     };
+
+    async updateAppointmentStatus(appointmentId, status, user) {
+        const appointment = await Turno.findById(appointmentId);
+
+        if (!appointment) throw new Error("Turno no encontrado");
+
+        // validar estado permitido
+        if (!["COMPLETED", "CANCELLED"].includes(status)) {
+            throw new Error("Estado inválido");
+        }
+
+        // si es OWNER, solo puede cancelar su propio turno
+        if (user.role === "OWNER") {
+            if (appointment.owner.toString() !== user.id) {   // si el id del owner del appointment NO COINCIDE con el id del token
+                throw new Error("No puedes modificar este turno");  // entonces intenta cancelar un turno de otro owner
+            };
+            if (status !== "CANCELLED") {
+                throw new Error("No puedes modificar este valor");
+            };
+        };
+
+        // evitar cambiar estados finales
+        if (appointment.status !== "SCHEDULED") {
+            throw new Error("El turno ya fue finalizado");
+        };
+
+        appointment.status = status;
+        await appointment.save();
+
+        // liberar bloque si se cancela
+        if (status === "CANCELLED") {
+            const block = await BloqueDisponible.findOne({
+                vet: appointment.vet,
+                date: appointment.date,
+                time: appointment.time,
+            });
+
+            if (block) {
+                block.available = true;
+                await block.save();
+            };
+        };
+        return appointment;
+    };
+
 
 
     

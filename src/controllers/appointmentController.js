@@ -121,11 +121,11 @@ export const getVetAgendaController = async (req, res) => {
 
 export const getVetDailyAgendaController = async (req, res) => {
   try{
-    const vetId = req.user.id;
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    const vetId = req.user.id;   // id del token
+    const today = new Date();    // trae la fecha de hoy
+    today.setHours(0,0,0,0);     // la establece al primer segundo del dia
+    const tomorrow = new Date(today);  // la fecha de mañana es hoy ...
+    tomorrow.setDate(today.getDate() + 1);  // ... más uno, igual a mañana
 
     const agenda = await as.getVetAgenda({
       vetId,
@@ -144,4 +144,23 @@ export const getVetDailyAgendaController = async (req, res) => {
   }
 };
 
+export const updateAppointmentStatusController = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+    const { status } = req.body;
+
+    const updated = await as.updateAppointmentStatus(
+      appointmentId,
+      status,
+      req.user
+    );
+
+    res.status(200).json({
+      message: "Estado del turno actualizado",
+      data: updated,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 

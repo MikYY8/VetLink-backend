@@ -8,6 +8,7 @@ import { getAvailableAppointmentsController,
         cancelAppointmentController,
         getVetAgendaController,
         getVetDailyAgendaController,
+        updateAppointmentStatusController,
 
         } from "../controllers/appointmentController.js";
 
@@ -30,6 +31,10 @@ appointmentRouter.get("/vet-agenda", authMiddleware, authRolesMiddleware(["VET"]
 
 // Ver agenda DIARIA del veterinario 
 appointmentRouter.get("/vet-agenda/today", authMiddleware, authRolesMiddleware(["VET"]), getVetDailyAgendaController)
+
+// Marcar turno como COMPLETED / CANCELLED
+appointmentRouter.patch("/status/:appointmentId", authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"]), updateAppointmentStatusController)
+
 
 
 export default appointmentRouter
