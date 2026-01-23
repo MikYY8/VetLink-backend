@@ -1,5 +1,5 @@
 import express from "express";
-import { getVetProfile, updateVetProfile, getVetAgenda } from "../controllers/vetController.js";
+import { getVetProfile, updateVetProfile } from "../controllers/vetController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js";
 import { authVetMiddleware } from "../middlewares/authVetMiddleware.js";
@@ -12,7 +12,5 @@ router.get("/me", authMiddleware, authVetMiddleware, authRolesMiddleware(["ADMIN
 // Veterinario puede editar su perfil
 router.put("/me", authMiddleware, authVetMiddleware, authRolesMiddleware(["ADMIN", "VET"]), updateVetProfile);
 
-// Veterinario puede ver su agenda de turnos
-router.get("/agenda/", authVetMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "VET"]), getVetAgenda);
 
 export default router;

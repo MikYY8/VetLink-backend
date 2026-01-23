@@ -6,8 +6,9 @@ import { getAvailableAppointmentsController,
         generateAvailabilityController,
         createAppointmentController,
         cancelAppointmentController,
-                // getVetAppointmentsController,
-                // getAllAppointmentsController,
+        getVetAgendaController,
+        getVetDailyAgendaController,
+
         } from "../controllers/appointmentController.js";
 
 const appointmentRouter = express.Router();
@@ -24,22 +25,11 @@ appointmentRouter.post("/make-appointment", authMiddleware, authRolesMiddleware(
 // Cancelar turno (PARA OWNERS / SECRETARIES / ADMINS)
 appointmentRouter.delete("/cancel/:appointmentId", authMiddleware, authRolesMiddleware(["OWNER", "VET", "SECRETARY", "ADMIN"]), cancelAppointmentController);
 
+// Ver agenda de turnos del veterinario (FILTROS POR FECHA Y STATUS)
+appointmentRouter.get("/vet-agenda", authMiddleware, authRolesMiddleware(["VET"]), getVetAgendaController)
 
+// Ver agenda DIARIA del veterinario 
+appointmentRouter.get("/vet-agenda/today", authMiddleware, authRolesMiddleware(["VET"]), getVetDailyAgendaController)
 
-
-
-
-
-// // Turnos programados (PARA VETS)
-// appointmentRouter.get("/scheduled", 
-//         // authMiddleware, authRolesMiddleware(["VET"]),
-//         // getVetAppointmentsController
-//         );
-
-// // Todos los turnos, habidos y por haber (PARA SECRETARIES / ADMINS)
-// appointmentRouter.get("/all-appointments", 
-//         // authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]),
-//         // getAllAppointmentsController
-//         );
 
 export default appointmentRouter

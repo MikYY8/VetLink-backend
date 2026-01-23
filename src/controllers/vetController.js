@@ -58,20 +58,3 @@ export const updateVetProfile = async (req, res) => {
     }
 };
 
-    // TURNOS DEL VETERINARIO (AGENDA)
-export const getVetAgenda = async (req, res) => {
-    try{
-        const { id } = req.params;
-        const { date } = req.query;
-
-        const availableSlots = await generateBlocksForVet(id, date);
-
-        res.status(200).json({
-            vetId: id,
-            date,
-            availableSlots,
-        });
-    }catch (error){
-        res.status(400).json({ message: error.message });
-    }
-};

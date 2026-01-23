@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import BloqueDisponible from "../models/availabilityBlockModel.js";
 import Veterinario from "../models/vetModel.js";
 import Turno from "../models/appointmentModel.js"
@@ -117,6 +118,31 @@ export class appointmentService {
         };
 
         return appointment;
+    };
+
+    async getVetAgenda({ vetId, from, to, status }) {
+        const filter = { vet: vetId };
+
+            // filtro por fechas
+        if (from || to) {
+        filter.date = {};
+            if (from) filter.date.$gte = new Date(from);
+            if (to) {
+                const endOfDay = new Date(to);
+                endOfDay.setHours(23, 59, 59, 999);
+                filter.date.$lte = endOfDay;
+            };
+        };
+
+            // filtro por estado
+        if (status) filter.status = status.trim();
+
+        const agenda = await Turno.find(filter)  // usamos los datos en filter para buscar turnos del vet
+        .populate("pet", "name species")     // popular datos útiles
+        .populate("owner", "firstName lastName")
+        .sort({ date: 1, time: 1 });
+        
+        return agenda;
     };
 
 

@@ -92,5 +92,56 @@ export const cancelAppointmentController = async (req, res) => {
   }
 };
 
+  // VER AGENDA DEL VETERINARIO
+export const getVetAgendaController = async (req, res) => {
+  try{
+    const vetId = req.user.id; // extraer del token el id del vet
+    console.log("vetId: " + vetId)
+          // const { date } = req.query; // para filtrar por fecha   edit: Ya no filtramos por 1 sola fecha
+    const { from, to, status } = req.query; // ahora necesitamos pasar a estas variables: desde esta fecha, hasta esta fecha, status del turno
+    console.log("From2: " + from)
+    console.log("To2: " + to)
+    console.log("Status2: " + status)
+    const agenda = await as.getVetAgenda({
+      vetId,
+      from,
+      to,
+      status,
+    });
+    console.log("Agenda2: " + agenda)
+
+    res.status(200).json({
+      message: "Agenda del veterinario",
+      data: agenda,
+    });
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const getVetDailyAgendaController = async (req, res) => {
+  try{
+    const vetId = req.user.id;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const agenda = await as.getVetAgenda({
+      vetId,
+      from: today,
+      to: tomorrow,
+      status: "SCHEDULED",
+    });
+
+    res.status(200).json({
+      message: "Agenda del día",
+      data: agenda
+    });
+
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+};
 
 
