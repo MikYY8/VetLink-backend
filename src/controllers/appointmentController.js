@@ -6,15 +6,7 @@ const as = new appointmentService();
 export const getAvailableAppointmentsController = async (req, res) => {
   try{
     const { date, specialty, vetId } = req.query;
-    console.log( "fecha: " + date + "especialidad: " + specialty + "ID del veterinario: " + vetId )
-
-    const available = await as.getAvailableAppointments({
-      date,
-      specialty,
-      vetId,
-    });
-
-    console.log( "Disponibilidad: " + available)
+    const available = await as.getAvailableAppointments({date, specialty, vetId});
 
     res.status(200).json({
       message: "Turnos disponibles",
@@ -27,7 +19,7 @@ export const getAvailableAppointmentsController = async (req, res) => {
 
     // CREAR BLOQUES DE DISPONIBILIDAD por vet
 export const generateAvailabilityController = async (req, res) => {
-  try {
+  try{
     const { vetId } = req.params;
     const { date } = req.body;
 
@@ -35,21 +27,18 @@ export const generateAvailabilityController = async (req, res) => {
       return res.status(400).json({ message: "La fecha es obligatoria" });
     }
 
-    const blocks = await as.getVetAvailability(
-      vetId,
-      date
-    );
+    const blocks = await as.getVetAvailability(vetId, date);
 
     res.status(201).json({
       message: "Disponibilidad generada",
       data: blocks,
     });
-  } catch (error) {
+  }catch(error){
     res.status(400).json({ message: error.message });
   }
 };
 
-  // CREAR TURNOOOOOOOOOOOOO
+  // CREAR TURNO pueden hacerlo owners, secres, admins
 export const createAppointmentController = async (req, res) => {
   try {
     const ownerId =
@@ -71,26 +60,99 @@ export const createAppointmentController = async (req, res) => {
   }
 };
 
-export const cancelAppointmentController = async (req, res) => {
-  try {
-    const { appointmentId } = req.params;
-    const userId = req.user.id;
-    const role = req.user.role;
+  // VER AGENDA DEL VETERINARIO con filtros por estado y fecha
+export const getVetAgendaController = async (req, res) => {
+  try{
+    const vetId = req.user.id; // extraer del token el id del vet
+    const { from, to, status } = req.query; // pasamos estas variables: desde esta fecha, hasta esta fecha, status del turno
 
-    const result = await as.cancelAppointment(
-      appointmentId,
-      userId,
-      role
-    );
+    const agenda = await as.getVetAgenda({ vetId, from, to, status, });
 
-    res.json({
-      message: "Turno cancelado correctamente",
-      data: result,
+    res.status(200).json({
+      message: "Agenda del veterinario",
+      data: agenda,
     });
-  } catch (error) {
+  }catch(error){
     res.status(400).json({ message: error.message });
   }
 };
 
+  // OBETENER AGENDA DIARIA DEL VET más compacta, solo los de hoy y mañana
+export const getVetDailyAgendaController = async (req, res) => {
+  try{
+    const vetId = req.user.id;   // id del token
+    const today = new Date();    // trae la fecha de hoy
+    today.setHours(0,0,0,0);     // la establece al primer segundo del dia
+    const tomorrow = new Date(today);  // la fecha de mañana es hoy ...
+    tomorrow.setDate(today.getDate() + 1);  // ... más uno, igual a mañana
+
+    const agenda = await as.getVetAgenda({
+      vetId,
+      from: today,
+      to: tomorrow,
+      status: "SCHEDULED",
+    });
+
+    res.status(200).json({
+      message: "Agenda del día",
+      data: agenda
+    });
+
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+};
+
+  // MODIFICAR ESTADO DE TURNOS a COMPLETED (solo vets) o CANCELLED (owners, secres, admins)
+export const updateAppointmentStatusController = async (req, res) => {
+  try{
+    const { appointmentId } = req.params;
+    const { status } = req.body;
+
+    const updated = await as.updateAppointmentStatus(appointmentId, status, req.user);
+
+    res.status(200).json({
+      message: "Estado del turno actualizado",
+      data: updated,
+    });
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+};
+
+  // DASHBOARD DE SECRETARIA con todos los turnos
+export const getDashboardController = async (req, res) => {
+  try{
+    const { date, from, to, vetId, status } = req.query;
+
+    const dashboard = await as.getDashboard({ date, from, to, vetId, status });
+
+    res.status(200).json({
+      message: "Dashboard de turnos",
+      data: dashboard,
+    });
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+};
+
+  // OBTENER TURNOS DEL OWNER (con filtro de estado, lo ideal seria solo traer los SCHEDULED y luego hacer un historial para los COMPLETED/CANCELLED)
+export const getOwnerAppointmentsController = async (req, res) => {
+  try{
+    const ownerId = req.user.id; 
+    let { status } = req.query;
+
+    if (!status) status = "SCHEDULED";
+
+    const appointments = await as.getOwnerAppointments({ ownerId, status });
+
+    res.status(200).json({
+      message: "Mis turnos",
+      data: appointments,
+    });
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+};
 
 

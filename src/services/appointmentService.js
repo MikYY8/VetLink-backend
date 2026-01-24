@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import BloqueDisponible from "../models/availabilityBlockModel.js";
 import Veterinario from "../models/vetModel.js";
 import Turno from "../models/appointmentModel.js"
@@ -9,12 +10,11 @@ export class appointmentService {
     // OBTENER TURNOS DISPONIBLES 
     async getAvailableAppointments ({ date, specialty, vetId }) {
         if (!date) throw new Error("La fecha es obligatoria");
+
         const query = {date, isAvailable: true};
 
         // Filtrar por veterinario
-        if (vetId) {
-            query.vet = vetId;
-        };
+        if (vetId) query.vet = vetId;
 
         // Filtrar por especialidad
         if (specialty) {
@@ -22,7 +22,9 @@ export class appointmentService {
             query.vet = { $in: vets.map(v => v._id) };
         };
 
-        const availableBlocks = await BloqueDisponible.find(query).populate("vet", "firstName lastName specialty");
+        const availableBlocks = await BloqueDisponible.find(query)
+            .populate("vet", "firstName lastName specialty");
+
         return availableBlocks;
     };
 
@@ -74,49 +76,128 @@ export class appointmentService {
         return appointment;
     };
 
-    async cancelAppointment(appointmentId, userId, role) {
+        // Ver agenda del vet, tiene filtros pero tambien soporta la version compacta
+    async getVetAgenda({ vetId, from, to, status }) {
+        const filter = { vet: vetId };
+
+            // filtro por fechas
+        if (from || to) {
+        filter.date = {};
+            if (from) filter.date.$gte = new Date(from);
+            if (to) {
+                const endOfDay = new Date(to);
+                endOfDay.setHours(23, 59, 59, 999);
+                filter.date.$lte = endOfDay;
+            };
+        };
+
+            // filtro por estado
+        if (status) filter.status = status.trim();
+
+        const agenda = await Turno.find(filter)  // usamos los datos en filter para buscar turnos del vet
+            .populate("pet", "name species")     // popular datos útiles
+            .populate("owner", "firstName lastName")
+            .sort({ date: 1, time: 1 });
+
+        return agenda;
+    };
+
+        // Modificar estado de turno, para cancelar, o marcar como completados
+    async updateAppointmentStatus(appointmentId, status, user) {
         const appointment = await Turno.findById(appointmentId);
 
         if (!appointment) throw new Error("Turno no encontrado");
 
-        // Permisos
-        if (role === "OWNER") {
-            if (appointment.owner.toString() !== userId.toString()) {
-            throw new Error("No tenés permiso para cancelar este turno");
+        // validar estado permitido
+        if (!["COMPLETED", "CANCELLED"].includes(status)) throw new Error("Estado inválido");
+
+        // si es OWNER, solo puede cancelar su propio turno
+        if (user.role === "OWNER") {
+            if (appointment.owner.toString() !== user.id) {   // si el id del owner del appointment NO COINCIDE con el id del token
+                throw new Error("No puedes modificar este turno");  // entonces intenta cancelar un turno de otro owner
             };
-        };
-        // !!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!!!!!!! UNTESTED !!!!!!!  aca no se si va a funcionar porque Vet no es un User .....
-        // !!!!!!!!!!!!!!!!!!!!!!!!!
-        if (role === "VET") {
-            if (appointment.vet.toString() !== userId.toString()) {
-            throw new Error("No tenés permiso para cancelar este turno");
+            if (status !== "CANCELLED") {
+                throw new Error("No puedes modificar este valor");
             };
         };
 
-        // Validación por si ya está cancelado
-        if (appointment.status === "CANCELLED") {
-            throw new Error("El turno ya está cancelado");
-        };
+        // evitar cambiar estados finales
+        if (appointment.status !== "SCHEDULED") throw new Error("El turno ya fue finalizado");
 
-        // Cancelar turno
-        appointment.status = "CANCELLED";
+        appointment.status = status;
         await appointment.save();
 
-        // Liberar bloque 
-        const block = await BloqueDisponible.findOne({
-            vet: appointment.vet,
-            date: appointment.date,
-            time: appointment.time,
-        });
+        // liberar bloque si se cancela
+        if (status === "CANCELLED") {
+            const block = await BloqueDisponible.findOne({
+                vet: appointment.vet,
+                date: appointment.date,
+                time: appointment.time,
+            });
 
-        if (block) {
-            block.available = true;
-            block.reason = "Disponible"
-            await block.save();
+            if (block) {
+                block.available = true;
+                await block.save();
+            };
+        };
+        return appointment;
+    };
+
+        // Dashboard de secretaria
+    async getDashboard({ date, from, to, vetId, status }) {
+        const filter = {};
+
+        // filtro por vet
+        if (vetId) filter.vet = vetId;
+
+        // filtro por estado
+        if (status) filter.status = status.trim();
+        
+        // filtro por fecha exacta
+        if (date) {
+            const start = new Date(date);
+            start.setHours(0,0,0,0);
+
+            const end = new Date(date);
+            end.setHours(23,59,59,999);
+
+            filter.date = { $gte: start, $lte: end };
         };
 
-        return appointment;
+        // filtro por rango
+        if (from || to) {
+            filter.date = {};
+
+            if (from) filter.date.$gte = new Date(from);
+            if (to) {
+            const end = new Date(to);
+            end.setHours(23,59,59,999);
+            filter.date.$lte = end;
+            };
+        };
+
+        const appointments = await Turno.find(filter)
+            .populate("vet", "firstName lastName")
+            .populate("owner", "firstName lastName")
+            .populate("pet", "name species")
+            .sort({ date: 1, time: 1 });
+
+        return appointments;
+    };
+
+        // Obtener turnos del owner
+    async getOwnerAppointments({ ownerId, status }) {
+        const filter = { owner: ownerId };
+
+        // filtro por estado
+        if (status) filter.status = status.trim();
+        
+        const appointments = await Turno.find(filter)
+            .populate("vet", "firstName lastName specialty")
+            .populate("pet", "name species")
+            .sort({ date: 1, time: 1 });
+
+        return appointments;
     };
 
 
