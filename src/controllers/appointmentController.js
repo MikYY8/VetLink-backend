@@ -140,7 +140,10 @@ export const getDashboardController = async (req, res) => {
 export const getOwnerAppointmentsController = async (req, res) => {
   try{
     const ownerId = req.user.id; 
-    const { status } = req.query;
+    let { status } = req.query;
+
+    if (!status) status = "SCHEDULED";
+
     const appointments = await as.getOwnerAppointments({ ownerId, status });
 
     res.status(200).json({
