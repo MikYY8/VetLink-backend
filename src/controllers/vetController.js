@@ -1,5 +1,4 @@
-import { generateBlocksForVet } from "../services/availabilityService.js";
-import Vet from "../models/vetModel.js";
+import Veterinario from "../models/vetModel.js";
 
 // const vs = new vetService();
 
@@ -7,7 +6,7 @@ import Vet from "../models/vetModel.js";
 export const getVetProfile = async (req, res) => {
   try{
     const vetId = req.user.id;
-    const vet = await Vet.findById(vetId).select("-password");
+    const vet = await Veterinario.findById(vetId).select("-password");
     if (!vet) {
       return res.status(404).json({ message: "Veterinario no encontrado" });
     }
@@ -40,7 +39,7 @@ export const updateVetProfile = async (req, res) => {
             }
         });
 
-        const updatedVet = await Vet.findByIdAndUpdate(
+        const updatedVet = await Veterinario.findByIdAndUpdate(
             vetId,
             updates,
             { new: true, runValidators: true }
