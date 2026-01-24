@@ -155,4 +155,19 @@ export const getOwnerAppointmentsController = async (req, res) => {
   }
 };
 
+  // OBTENER HISTORIAL DE TURNOS DEL OWNER (Turnos con status COMPLETED y CANCELLED)
+export const getAppointmentsHistoryController = async (req, res) => {
+  try{
+    const ownerId = req.user.id; 
+    let { status } = req.query;
 
+    const history = await as.getAppointmentsHistory({ ownerId, status });
+
+    res.status(200).json({
+      message: "Turnos pasados",
+      data: history,
+    });
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+};

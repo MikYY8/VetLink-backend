@@ -1,8 +1,6 @@
-import mongoose from "mongoose";
 import BloqueDisponible from "../models/availabilityBlockModel.js";
 import Veterinario from "../models/vetModel.js";
 import Turno from "../models/appointmentModel.js"
-import Mascota from "../models/petModel.js"
 
 import { generateBlocksForVet } from "../services/availabilityService.js"
 
@@ -200,6 +198,23 @@ export class appointmentService {
         return appointments;
     };
 
+        // Obtener historial de turnos del owner
+    async getAppointmentsHistory({ ownerId, status }) {
+        const filter = { owner: ownerId };
 
+        // filtro por estado
+        if (status) {
+            filter.status = status.trim();
+        } else {
+            filter.status = { $in: ["COMPLETED", "CANCELLED"] };
+        };
+        
+        const history = await Turno.find(filter)
+            .populate("vet", "firstName lastName specialty")
+            .populate("pet", "name species")
+            .sort({ date: 1, time: 1 });
+
+        return history;
+    };
     
 };
