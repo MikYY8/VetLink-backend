@@ -5,10 +5,11 @@ import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js" // (
 import { getAvailableAppointmentsController, 
         generateAvailabilityController,
         createAppointmentController,
-        cancelAppointmentController,
+        // cancelAppointmentController,
         getVetAgendaController,
         getVetDailyAgendaController,
         updateAppointmentStatusController,
+        getDashboardController,
 
         } from "../controllers/appointmentController.js";
 
@@ -23,8 +24,9 @@ appointmentRouter.post("/availability/generate/:vetId", generateAvailabilityCont
 // Crear turno (PARA OWNERS / SECRETARIES / ADMINS)
 appointmentRouter.post("/make-appointment", authMiddleware, authRolesMiddleware(["OWNER", "SECRETARY", "ADMIN"]), createAppointmentController);
 
-// Cancelar turno (PARA OWNERS / SECRETARIES / ADMINS)
-appointmentRouter.delete("/cancel/:appointmentId", authMiddleware, authRolesMiddleware(["OWNER", "VET", "SECRETARY", "ADMIN"]), cancelAppointmentController);
+// Cancelar turno (PARA OWNERS / SECRETARIES / ADMINS) lo saco porque esta mas completo el otro
+// definitivamente no me olvidé de que ya tenia este hecho, como crees
+// appointmentRouter.delete("/cancel/:appointmentId", authMiddleware, authRolesMiddleware(["OWNER", "VET", "SECRETARY", "ADMIN"]), cancelAppointmentController);
 
 // Ver agenda de turnos del veterinario (FILTROS POR FECHA Y STATUS)
 appointmentRouter.get("/vet-agenda", authMiddleware, authRolesMiddleware(["VET"]), getVetAgendaController)
@@ -35,6 +37,6 @@ appointmentRouter.get("/vet-agenda/today", authMiddleware, authRolesMiddleware([
 // Marcar turno como COMPLETED / CANCELLED
 appointmentRouter.patch("/status/:appointmentId", authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"]), updateAppointmentStatusController)
 
-
+appointmentRouter.get("/dashboard", authMiddleware, authRolesMiddleware(["SECRETARY", "ADMIN"]), getDashboardController)
 
 export default appointmentRouter

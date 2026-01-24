@@ -6,15 +6,7 @@ const as = new appointmentService();
 export const getAvailableAppointmentsController = async (req, res) => {
   try{
     const { date, specialty, vetId } = req.query;
-    console.log( "fecha: " + date + "especialidad: " + specialty + "ID del veterinario: " + vetId )
-
-    const available = await as.getAvailableAppointments({
-      date,
-      specialty,
-      vetId,
-    });
-
-    console.log( "Disponibilidad: " + available)
+    const available = await as.getAvailableAppointments({date, specialty, vetId});
 
     res.status(200).json({
       message: "Turnos disponibles",
@@ -27,7 +19,7 @@ export const getAvailableAppointmentsController = async (req, res) => {
 
     // CREAR BLOQUES DE DISPONIBILIDAD por vet
 export const generateAvailabilityController = async (req, res) => {
-  try {
+  try{
     const { vetId } = req.params;
     const { date } = req.body;
 
@@ -35,16 +27,13 @@ export const generateAvailabilityController = async (req, res) => {
       return res.status(400).json({ message: "La fecha es obligatoria" });
     }
 
-    const blocks = await as.getVetAvailability(
-      vetId,
-      date
-    );
+    const blocks = await as.getVetAvailability(vetId, date);
 
     res.status(201).json({
       message: "Disponibilidad generada",
       data: blocks,
     });
-  } catch (error) {
+  }catch(error){
     res.status(400).json({ message: error.message });
   }
 };
@@ -71,44 +60,37 @@ export const createAppointmentController = async (req, res) => {
   }
 };
 
-export const cancelAppointmentController = async (req, res) => {
-  try {
-    const { appointmentId } = req.params;
-    const userId = req.user.id;
-    const role = req.user.role;
+// export const cancelAppointmentController = async (req, res) => {
+//   try {
+//     const { appointmentId } = req.params;
+//     const userId = req.user.id;
+//     const role = req.user.role;
 
-    const result = await as.cancelAppointment(
-      appointmentId,
-      userId,
-      role
-    );
+//     const result = await as.cancelAppointment(appointmentId, userId, role);
 
-    res.json({
-      message: "Turno cancelado correctamente",
-      data: result,
-    });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
+//     res.json({
+//       message: "Turno cancelado correctamente",
+//       data: result,
+//     });
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// };
 
   // VER AGENDA DEL VETERINARIO
 export const getVetAgendaController = async (req, res) => {
   try{
     const vetId = req.user.id; // extraer del token el id del vet
-    console.log("vetId: " + vetId)
+
           // const { date } = req.query; // para filtrar por fecha   edit: Ya no filtramos por 1 sola fecha
     const { from, to, status } = req.query; // ahora necesitamos pasar a estas variables: desde esta fecha, hasta esta fecha, status del turno
-    console.log("From2: " + from)
-    console.log("To2: " + to)
-    console.log("Status2: " + status)
+
     const agenda = await as.getVetAgenda({
       vetId,
       from,
       to,
       status,
     });
-    console.log("Agenda2: " + agenda)
 
     res.status(200).json({
       message: "Agenda del veterinario",
@@ -145,22 +127,34 @@ export const getVetDailyAgendaController = async (req, res) => {
 };
 
 export const updateAppointmentStatusController = async (req, res) => {
-  try {
+  try{
     const { appointmentId } = req.params;
     const { status } = req.body;
 
-    const updated = await as.updateAppointmentStatus(
-      appointmentId,
-      status,
-      req.user
-    );
+    const updated = await as.updateAppointmentStatus(appointmentId, status, req.user);
 
     res.status(200).json({
       message: "Estado del turno actualizado",
       data: updated,
     });
-  } catch (error) {
+  }catch(error){
     res.status(400).json({ message: error.message });
   }
 };
+
+export const getDashboardController = async (req, res) => {
+  try{
+    const { date, from, to, vetId, status } = req.query;
+
+    const dashboard = await as.getDashboard({ date, from, to, vetId, status });
+
+    res.status(200).json({
+      message: "Dashboard de turnos",
+      data: dashboard,
+    });
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+};
+
 
