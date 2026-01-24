@@ -10,6 +10,7 @@ import { getAvailableAppointmentsController,
         getVetDailyAgendaController,
         updateAppointmentStatusController,
         getDashboardController,
+        getOwnerAppointmentsController,
 
         } from "../controllers/appointmentController.js";
 
@@ -37,6 +38,11 @@ appointmentRouter.get("/vet-agenda/today", authMiddleware, authRolesMiddleware([
 // Marcar turno como COMPLETED / CANCELLED
 appointmentRouter.patch("/status/:appointmentId", authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"]), updateAppointmentStatusController)
 
+// Dashboard de la secretaria
 appointmentRouter.get("/dashboard", authMiddleware, authRolesMiddleware(["SECRETARY", "ADMIN"]), getDashboardController)
+
+// Ver turnos del OWNER
+appointmentRouter.get("/my-appointments", authMiddleware, authRolesMiddleware(["OWNER", "ADMIN"]), getOwnerAppointmentsController)
+
 
 export default appointmentRouter
