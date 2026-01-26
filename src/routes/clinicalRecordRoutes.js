@@ -3,17 +3,25 @@ import { authMiddleware } from "../middlewares/authMiddleware.js"; // token vali
 import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js" // (["OWNER", "ADMIN", "SECRETARY"])
 
 import { createClinicalRecordController,
-        getClinicalRecordsByPetController
-    
+        getClinicalRecordsByPetController,
+        updateClinicalRecordController,
+        deleteClinicalRecordController
         } from "../controllers/clinicalRecordController.js";
 
 const clinicalRecordRouter = express.Router();
 
-// Agregar nuevo registro al historial medico 
-clinicalRecordRouter.post("/new", authMiddleware, authRolesMiddleware(["VET"]), createClinicalRecordController)
-// authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"])
-
-// Ver historial por mascota 
+// Ver historial clinico por mascota 
 clinicalRecordRouter.get("/pet/:petId", authMiddleware, authRolesMiddleware(["VET", "OWNER"]), getClinicalRecordsByPetController);
+
+// Agregar nuevo registro al historial clinico 
+clinicalRecordRouter.post("/new-clinical-record", authMiddleware, authRolesMiddleware(["VET"]), createClinicalRecordController)
+
+// Modificar registro del historial clinico por mascota 
+clinicalRecordRouter.put("/pet/:clinicalRecordId", authMiddleware, authRolesMiddleware(["VET"]), updateClinicalRecordController);
+
+// Eliminar registro del historial clinico por mascota 
+clinicalRecordRouter.delete("/pet/:clinicalRecordId", authMiddleware, authRolesMiddleware(["VET"]), deleteClinicalRecordController);
+
+
 
 export default clinicalRecordRouter

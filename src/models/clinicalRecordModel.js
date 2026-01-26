@@ -1,15 +1,20 @@
 import mongoose from "mongoose";
 
 const clinicalRecordSchema = new mongoose.Schema({
+    appointment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Appointment",
+        required: true
+    },
     pet: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Pet",
-        required: true,
+        required: true
     },
     vet: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Vet",
-        required: true,
+        required: true
     },
     date: {
         type: Date,
