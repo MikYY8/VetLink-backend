@@ -2,15 +2,15 @@ import express from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js"; // token valido 
 import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js" // (["OWNER", "ADMIN", "SECRETARY"])
 
-import { getAvailableAppointmentsController, 
-        generateAvailabilityController,
-        createAppointmentController,
+import { generateAvailabilityController, 
+        getAvailableAppointmentsController, 
         getVetAgendaController,
         getVetDailyAgendaController,
-        updateAppointmentStatusController,
         getDashboardController,
         getOwnerAppointmentsController,
         getAppointmentsHistoryController,
+        createAppointmentController,
+        updateAppointmentStatusController,
         } from "../controllers/appointmentController.js";
 
 const appointmentRouter = express.Router();
