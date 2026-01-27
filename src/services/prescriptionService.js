@@ -40,15 +40,34 @@ export class prescriptionService {
         const prescription = await Receta.findById(prescriptionId);
         if (!prescription) throw new Error("No se encontró la receta");
 
-        Object.assign(prescription, updateData);
-        await prescription.save();
+        const allowedUpdates = [
+            "medication.name",
+            "medication.dose",
+            "medication.frequency",
+            "notes"
+        ];
 
-        return prescription;
+        const updateObject = {};
+
+        for (const key in updateData) {
+            if (!allowedUpdates.includes(key)) {
+            throw new Error(`No se puede actualizar el campo ${key}`);
+            }
+            updateObject[key] = updateData[key];
+        }
+
+        const updatedPrescription = await Receta.findByIdAndUpdate(
+            prescriptionId,
+            { $set: updateObject },
+            { new: true, runValidators: true }
+        );
+
+        return updatedPrescription;
     };
 
         // Eliminar una receta
     async deletePrescriptionController(prescriptionId){
-        const prescription = await HistorialClinico.findById(prescriptionId);
+        const prescription = await Receta.findById(prescriptionId);
         if (!prescription) throw new Error("Receta no encontrada");
     
         await prescription.deleteOne();
