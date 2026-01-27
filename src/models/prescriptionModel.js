@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
 
 const prescriptionSchema = new mongoose.Schema({
+    appointment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Appointment",
+        required: true,
+        unique: true
+    },
     pet: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Pet",
@@ -16,13 +22,12 @@ const prescriptionSchema = new mongoose.Schema({
         required: true,
     },
     medication: {
-        name: { type: String },
-        dose: { type: String }, 
-        frequency: { type: String }, 
+        name: { type: String, required: true },
+        dose: { type: String, required: true },
+        frequency: { type: String, required: true }
     },
     notes: {
-        type: String,
-        required: true
+        type: String
     }
   },
   { timestamps: true }

@@ -4,7 +4,8 @@ const clinicalRecordSchema = new mongoose.Schema({
     appointment: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Appointment",
-        required: true
+        required: true,
+        unique: true
     },
     pet: {
         type: mongoose.Schema.Types.ObjectId,
