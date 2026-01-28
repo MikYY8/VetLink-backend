@@ -4,6 +4,7 @@ import Turno from "../models/appointmentModel.js"
 import Mascota from "../models/petModel.js";
 import { dogVaccines, catVaccines } from "../utils/vaccineCatalog.js"
 import Vacuna from "../models/vaccineModel.js";
+import CalendarioVacunatorio from "../models/vaccineScheduleModel.js";
 
 import { generateBlocksForVet } from "../services/availabilityService.js"
 
@@ -59,6 +60,7 @@ export class appointmentService {
         // si es vacunación, validar vacuna
         let selectedVaccine = null;
 
+        // Si el owner selecciona VACUNACION, se habilita selección de vacuna
         if (type === "VACCINATION") {
             if (!vaccineName) throw new Error("Debe seleccionar una vacuna");
 
@@ -67,10 +69,10 @@ export class appointmentService {
 
             let allowedVaccines = [];
 
-            if (pet.species === "DOG") {
-                allowedVaccines = dogVaccines;
-            } else if (pet.species === "CAT") {
-                allowedVaccines = catVaccines;
+            if (pet.species === "DOG") {        // si la mascota en cuestion es perro
+                allowedVaccines = dogVaccines;  // mostrar SOLO vacunas de perro
+            } else if (pet.species === "CAT") { // si es gato
+                allowedVaccines = catVaccines;  // mostrar SOLO vacunas de gato
             } else {
                 throw new Error("Especie no soportada para vacunación");
             };
@@ -150,23 +152,14 @@ export class appointmentService {
         // evitar cambiar estados finales
         if (appointment.status !== "SCHEDULED") throw new Error("El turno ya fue finalizado");
 
+        // guardar nuevo status
         appointment.status = status;
         await appointment.save();
 
-        if (status === "COMPLETED" && appointment.type === "VACCINATION"){
-            const existingVaccine = await Vacuna.findOne({ appointment: appointmentId });
-            if (existingVaccine) return appointment;
-        
-            await Vacuna.create({
-                pet: appointment.pet,
-                vet: appointment.vet,
-                appointment: appointmentId,
-                vaccineName: appointment.vaccineName,
-                appliedDate: appointment.date,
-                notes: notes || ""
-            });
-        };
-
+        // si es vacunación y se completa -> llamar a vacunación
+        if (status === "COMPLETED" && appointment.type === "VACCINATION") {
+            await this.handleVaccination(appointment, notes);
+        }
         // liberar bloque si se cancela
         if (status === "CANCELLED") {
             const block = await BloqueDisponible.findOne({
@@ -181,6 +174,50 @@ export class appointmentService {
             };
         };
         return appointment;
+    };
+
+    async handleVaccination(appointment, notes) {
+        const existingVaccine = await Vacuna.findOne({ appointment: appointment._id });
+        if (existingVaccine) return;
+
+        const pet = await Mascota.findById(appointment.pet);
+        const catalog = pet.species === "DOG" ? dogVaccines : catVaccines;
+        const vaccineInfo = catalog.find(v => v.name === appointment.vaccineName);
+
+        if (!vaccineInfo) throw new Error("Vacuna no encontrada en catálogo");
+
+        const appliedDate = appointment.date;
+        const nextDueDate = new Date(appliedDate);
+        nextDueDate.setDate(nextDueDate.getDate() + vaccineInfo.intervalDays);
+
+        // guardar historial
+        await Vacuna.create({
+            pet: appointment.pet,
+            vet: appointment.vet,
+            appointment: appointment._id,
+            vaccineName: appointment.vaccineName,
+            appliedDate,
+            notes: notes || ""
+        });
+
+        // crear o actualizar calendario
+        const existingSchedule = await VaccineSchedule.findOne({
+            pet: appointment.pet,
+            vaccineName: appointment.vaccineName
+        });
+
+        if (!existingSchedule) {
+            await VaccineSchedule.create({
+            pet: appointment.pet,
+            vaccineName: appointment.vaccineName,
+            lastAppliedDate: appliedDate,
+            nextDueDate
+            });
+        } else {
+            existingSchedule.lastAppliedDate = appliedDate;
+            existingSchedule.nextDueDate = nextDueDate;
+            await existingSchedule.save();
+        };
     };
 
         // Dashboard de secretaria
