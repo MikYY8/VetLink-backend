@@ -105,11 +105,12 @@ export const getVetDailyAgendaController = async (req, res) => {
 
   // MODIFICAR ESTADO DE TURNOS a COMPLETED (solo vets) o CANCELLED (owners, secres, admins)
 export const updateAppointmentStatusController = async (req, res) => {
-  try{
+  try{ 
+    const user = req.user;
     const { appointmentId } = req.params;
-    const { status } = req.body;
+    const { status, notes } = req.body;
 
-    const updated = await as.updateAppointmentStatus(appointmentId, status, req.user);
+    const updated = await as.updateAppointmentStatus(appointmentId, status, notes, user);
 
     res.status(200).json({
       message: "Estado del turno actualizado",

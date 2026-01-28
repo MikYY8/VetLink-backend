@@ -11,18 +11,22 @@ const vaccineSchema = new mongoose.Schema({
         ref: "Vet",
         required: true,
     },
-    date: {
-        type: Date,
+    appointment: {
+        type: mongoose.Schema.Types.ObjectId,
         required: true,
+        unique: true
     },
-    type: {
+    vaccineName: {
         type: String,
         required: true
     },
-    nextDose: {
+    appliedDate: {
         type: Date,
-        required: true
+        required: true,
     },
+    notes: {
+        type: String
+    }
   },
   { timestamps: true }
 );
