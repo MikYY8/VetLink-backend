@@ -1,4 +1,4 @@
-import vaccineService from "../services/vaccineService.js";
+import { vaccineService } from "../services/vaccineService.js"
 
 const vs = new vaccineService();
 

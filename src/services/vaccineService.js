@@ -1,18 +1,24 @@
 import Vacuna from "../models/vaccineModel.js";
 import CalendarioVacunatorio from "../models/vaccineScheduleModel.js";
 
-// Obtener vacunas dadas a la mascota
-export class vaccineService{
+export class vaccineService {
+
+     // Obtener vacunas dadas a la mascota
     async getVaccineHistory(petId) {
-    return await Vacuna.find({ pet: petId })
-        .populate("vet", "firstName lastName")
-        .sort({ appliedDate: -1 });
+        const vaccine = await Vacuna.find({ pet: petId })
+            .populate("vet", "firstName lastName")
+            .sort({ appliedDate: -1 });
+
+        return vaccine;
     };
 
     // Obtener vacunas próximas de la mascota
     async getVaccineSchedule(petId) {
-    return await CalendarioVacunatorio.find({ pet: petId })
+        const vaccine = await CalendarioVacunatorio.find({ pet: petId })
         .sort({ nextDueDate: 1 });
+
+        return vaccine; 
     };
 
 };
+

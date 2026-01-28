@@ -4,9 +4,9 @@ import Turno from "../models/appointmentModel.js"
 import Mascota from "../models/petModel.js";
 import { dogVaccines, catVaccines } from "../utils/vaccineCatalog.js"
 import Vacuna from "../models/vaccineModel.js";
-import CalendarioVacunatorio from "../models/vaccineScheduleModel.js";
 
 import { generateBlocksForVet } from "../services/availabilityService.js"
+import CalendarioVacunatorio from "../models/vaccineScheduleModel.js";
 
 export class appointmentService {
     // OBTENER TURNOS DISPONIBLES 
@@ -131,7 +131,7 @@ export class appointmentService {
     };
 
         // Modificar estado de turno, para cancelar, o marcar como completados
-    async updateAppointmentStatus(appointmentId, status, user, notes) {
+    async updateAppointmentStatus(appointmentId, status, notes, user) {
         const appointment = await Turno.findById(appointmentId);
 
         if (!appointment) throw new Error("Turno no encontrado");
@@ -201,13 +201,13 @@ export class appointmentService {
         });
 
         // crear o actualizar calendario
-        const existingSchedule = await VaccineSchedule.findOne({
+        const existingSchedule = await CalendarioVacunatorio.findOne({
             pet: appointment.pet,
             vaccineName: appointment.vaccineName
         });
 
         if (!existingSchedule) {
-            await VaccineSchedule.create({
+            await CalendarioVacunatorio.create({
             pet: appointment.pet,
             vaccineName: appointment.vaccineName,
             lastAppliedDate: appliedDate,
