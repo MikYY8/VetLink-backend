@@ -1,20 +1,16 @@
 import express from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js";
-import { createVaccineController,
-        getVaccinesByPetController,
-        updateVaccineController
+import { getVaccineHistoryController,
+         getVaccineScheduleController,
         } from "../controllers/vaccineController.js";
 
 const vaccineRouter = express.Router();
 
-// Crear vacuna 
-vaccineRouter.post("/new-vaccine", authMiddleware, authRolesMiddleware(["VET"]), createVaccineController);
+// Ver historial de vacunas de una mascota
+vaccineRouter.get("/history/:petId", authMiddleware, authRolesMiddleware(["OWNER", "VET", "ADMIN"]), getVaccineHistoryController);
 
-// Ver vacunas de una mascota 
-vaccineRouter.get("/pet/:petId", authMiddleware, authRolesMiddleware(["OWNER", "VET", "ADMIN", "SECRETARY"]), getVaccinesByPetController);
-
-// Modificar vacuna 
-vaccineRouter.patch("/:vaccineId", authMiddleware, authRolesMiddleware(["VET"]), updateVaccineController);
+// Ver calendario de vacunas próximas de la mascota
+vaccineRouter.get("/schedule/:petId", authMiddleware, authRolesMiddleware(["OWNER", "VET", "ADMIN"]), getVaccineScheduleController);
 
 export default vaccineRouter;

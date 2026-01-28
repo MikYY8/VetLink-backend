@@ -9,6 +9,7 @@ import ownerRoutes from "./src/routes/ownerRoutes.js"
 import appointmentRoutes from "./src/routes/appointmentRoutes.js"
 import clinicalRecordRoutes from "./src/routes/clinicalRecordRoutes.js"
 import prescriptionRouter from "./src/routes/prescriptionRoutes.js"
+import vaccineRouter from './src/routes/vaccineRoutes.js'
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -33,6 +34,7 @@ app.use("/owner", ownerRoutes);
 app.use("/appointment", appointmentRoutes);
 app.use("/clinicalRecord", clinicalRecordRoutes); 
 app.use("/prescription", prescriptionRouter);
+app.use("/vaccines", vaccineRouter);
 
 
 mongoose.connect(process.env.MONGOURL).then(()=>{
