@@ -107,9 +107,9 @@ export const getVetDailyAgendaController = async (req, res) => {
 export const updateAppointmentStatusController = async (req, res) => {
   try{
     const { appointmentId } = req.params;
-    const { status } = req.body;
+    const { status, notes } = req.body;
 
-    const updated = await as.updateAppointmentStatus(appointmentId, status, req.user);
+    const updated = await as.updateAppointmentStatus(appointmentId, status, notes, req.user);
 
     res.status(200).json({
       message: "Estado del turno actualizado",

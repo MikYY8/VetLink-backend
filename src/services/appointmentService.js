@@ -1,6 +1,9 @@
 import BloqueDisponible from "../models/availabilityBlockModel.js";
 import Veterinario from "../models/vetModel.js";
 import Turno from "../models/appointmentModel.js"
+import Mascota from "../models/petModel.js";
+import { dogVaccines, catVaccines } from "../utils/vaccineCatalog.js"
+import Vacuna from "../models/vaccineModel.js";
 
 import { generateBlocksForVet } from "../services/availabilityService.js"
 
@@ -41,7 +44,7 @@ export class appointmentService {
     };
 
         // CREAR TURNO (POR FIN QUE EMOCION)
-    async createAppointment({ petId, vetId, ownerId, date, time, type, details }) {
+    async createAppointment({ petId, vetId, ownerId, date, time, type, details, vaccineName }) {
 
         //  VERIFICACION 1: Verificar bloque disponible
         const block = await BloqueDisponible.findOne({
@@ -53,6 +56,30 @@ export class appointmentService {
 
         if (!block) throw new Error("El turno ya no está disponible");
         
+        // si es vacunación, validar vacuna
+        let selectedVaccine = null;
+
+        if (type === "VACCINATION") {
+            if (!vaccineName) throw new Error("Debe seleccionar una vacuna");
+
+            const pet = await Mascota.findById(petId);
+                if (!pet) throw new Error("Mascota no encontrada");
+
+            let allowedVaccines = [];
+
+            if (pet.species === "DOG") {
+                allowedVaccines = dogVaccines;
+            } else if (pet.species === "CAT") {
+                allowedVaccines = catVaccines;
+            } else {
+                throw new Error("Especie no soportada para vacunación");
+            };
+
+            selectedVaccine = allowedVaccines.find(v => v.name === vaccineName);
+
+            if (!selectedVaccine)   throw new Error("Vacuna no válida para esta especie");
+        }
+
         // Crear turno
         const appointment = await Turno.create({
             pet: petId,
@@ -61,6 +88,7 @@ export class appointmentService {
             date,
             time,
             type,
+            vaccineName: type == "VACCINATION" ? vaccineName : null,
             details,
             price: 100,
             status: "SCHEDULED",
@@ -101,7 +129,7 @@ export class appointmentService {
     };
 
         // Modificar estado de turno, para cancelar, o marcar como completados
-    async updateAppointmentStatus(appointmentId, status, user) {
+    async updateAppointmentStatus(appointmentId, status, user, notes) {
         const appointment = await Turno.findById(appointmentId);
 
         if (!appointment) throw new Error("Turno no encontrado");
@@ -124,6 +152,20 @@ export class appointmentService {
 
         appointment.status = status;
         await appointment.save();
+
+        if (status === "COMPLETED" && appointment.type === "VACCINATION"){
+            const existingVaccine = await Vacuna.findOne({ appointment: appointmentId });
+            if (existingVaccine) return appointment;
+        
+            await Vacuna.create({
+                pet: appointment.pet,
+                vet: appointment.vet,
+                appointment: appointmentId,
+                vaccineName: appointment.vaccineName,
+                appliedDate: appointment.date,
+                notes: notes || ""
+            });
+        };
 
         // liberar bloque si se cancela
         if (status === "CANCELLED") {
