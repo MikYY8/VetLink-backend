@@ -16,8 +16,9 @@ const PORT = process.env.PORT || 3000
 // const JWT_ACCESS = process.env.JWT_ACCESS
 
 const corsOptions = {  // origin: ["http://localhost:5173", "https://TU-FRONT.netlify.app"],
-  "origin": ["http://localhost:3000"], // agregar "https://midominio.com.ar" cuando tengamos
+  "origin": ["http://localhost:5173"], // agregar "https://midominio.com.ar" cuando tengamos
   "methods": "GET,POST,PUT,DELETE",
+  "credentials" : true,
   "allowedHeaders": ["Content-Type", "Authorization", "x-refresh-token"]
 };
 
