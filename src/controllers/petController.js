@@ -47,9 +47,9 @@ export const createPetController = async (req, res) => {
       req.user.role === "OWNER"
         ? req.user.id
         : req.body.ownerId;
-        console.log(ownerId)
+
     const petData = req.body;    // body del request, es decir, datos ingresados y procesados por el service
-    console.log(petData)
+
     const newPet = await ps.createPet(petData, ownerId);
 
     res.status(201).json({

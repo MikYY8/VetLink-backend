@@ -232,26 +232,18 @@ export class appointmentService {
         
         // filtro por fecha exacta
         if (date) {
-            const start = new Date(date);
-            start.setHours(0,0,0,0);
-
-            const end = new Date(date);
-            end.setHours(23,59,59,999);
-
+            const start = new Date(`${date}T00:00:00`);
+            const end = new Date(`${date}T23:59:59.999`);
             filter.date = { $gte: start, $lte: end };
-        };
+        }
 
         // filtro por rango
         if (from || to) {
             filter.date = {};
 
-            if (from) filter.date.$gte = new Date(from);
-            if (to) {
-            const end = new Date(to);
-            end.setHours(23,59,59,999);
-            filter.date.$lte = end;
-            };
-        };
+            if (from) filter.date.$gte = new Date(`${from}T00:00:00`);
+            if (to) filter.date.$lte = new Date(`${to}T23:59:59.999`);
+        }
 
         const appointments = await Turno.find(filter)
             .populate("vet", "firstName lastName")

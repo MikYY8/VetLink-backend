@@ -10,19 +10,12 @@ export const authMiddleware = (req, res, next) => {
     const accesstoken = authHeader?.split(" ")[1];
 
     // Si no hay access token
-    if (!accesstoken) {
-        return res.status(401).json({ message: "Token no encontrado" }),
-        console.log(err)
-    }
+    if (!accesstoken) return res.status(401).json({ message: "Token no encontrado" });
 
     // Si el token está mal o se venció el tiempo de duración 
     jwt.verify(accesstoken, process.env.JWT_ACCESS, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: "Token inválido o expirado" });
-        }
+        if (err) return res.status(403).json({ message: "Token inválido o expirado" });
         req.user = user;
         next();
     });
-
-    console.log(req.user)
 };

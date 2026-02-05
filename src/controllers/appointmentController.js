@@ -123,6 +123,7 @@ export const updateAppointmentStatusController = async (req, res) => {
 
   // DASHBOARD DE SECRETARIA con todos los turnos
 export const getDashboardController = async (req, res) => {
+
   try{
     const { date, from, to, vetId, status } = req.query;
 
