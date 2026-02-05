@@ -55,7 +55,7 @@ export const loginController = async (req, res) => {
             "x-refresh-token": refreshtoken,
         });
         res.status(200).json({
-            mensage: "success",
+            message: "success",
             code: 200,
             data: { accesstoken, refreshtoken },
         });
@@ -74,7 +74,7 @@ export const renovateTokenController = async (req, res) => {
             "x-refresh-token": refreshtoken,
         });
         res.status(200).json({
-            mensage: "success",
+            message: "success",
             code: 200,
             data: { accesstoken, refreshtoken },
         });
@@ -88,7 +88,7 @@ export const getAllUsersController = async (req, res) => {
     try{
         const users = await Usuario.find()
         res.status(200).json({
-            mensage: "success",
+            message: "success",
             code: 200,
             data: users
         });
@@ -102,7 +102,7 @@ export const getAllVetsController = async (req, res) => {
     try{
         const vets = await Veterinario.find()
         res.status(200).json({
-            mensage: "success",
+            message: "success",
             code: 200,
             data: vets
         });
@@ -126,7 +126,7 @@ export const updateUserController = async (req, res) => {
 
         const updatedUser = await us.updateUser(ownerId, updateData, user); 
         res.status(200).json({
-            mensage: "success",
+            message: "success",
             code: 200,
             data: updatedUser
         });
@@ -154,13 +154,13 @@ export const deleteUserController = async (req, res) => {
     export const updateVetController = async (req, res) => {
     try{
         const { vetId } = req.params;
-        console.log(vetId)
+
         const vet = await Veterinario.find({vetId})
         const updateData = req.body;
 
         const updatedVet = await us.updateVet(vetId, updateData, vet); 
         res.status(200).json({
-            mensage: "success",
+            message: "success",
             code: 200,
             data: updatedVet
         });
