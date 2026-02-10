@@ -2,6 +2,8 @@ import { userService } from "../services/userService.js"
 import Usuario from "../models/userModel.js"
 import Veterinario from "../models/vetModel.js";
 
+import cloudinary from "../config/cloudinary.js"
+
 const us = new userService();
 
     // REGISTRO DE USUARIOS (SECRETARY, ADMIN)
@@ -32,8 +34,15 @@ export const registerUserController = async (req, res) => {
     // REGISTRO DE VETERINARIOS (SECRETARY, ADMIN)
 export const registerVetController = async (req, res) => {
     try{
-        const { firstName, lastName, email, password, licenseNumber, specialty, workSchedule, acceptsConsultations } = req.body;
-        const newVet = await us.registerVet(firstName, lastName, email, password, licenseNumber, specialty, workSchedule, acceptsConsultations);
+        const { firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule } = req.body;
+        let photoUrl = null;
+        
+        if(req.file){
+            const result = await cloudinary.uploader.upload(req.file.path);
+            photoUrl = result.secure_url;
+        };
+
+        const newVet = await us.registerVet(firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl);
         
         res.status(201).json({
           message: "Success",

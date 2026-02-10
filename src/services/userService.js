@@ -18,13 +18,13 @@ export class userService {
     };
 
         // REGISTRAR VETERINARIO
-    async registerVet (firstName, lastName, email, password, licenseNumber, specialty, workSchedule, acceptsConsultations){
+    async registerVet (firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl){
         const existingVet = await Veterinario.findOne({ email });
         if(existingVet){
             throw new Error("E-mail ya registrado");
         };
 
-        const newVet = await Veterinario.create({ firstName, lastName, email, password, licenseNumber, specialty, workSchedule, acceptsConsultations })
+        const newVet = await Veterinario.create({ firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl })
         
         return newVet;
     };
