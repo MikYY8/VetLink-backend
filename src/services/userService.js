@@ -76,6 +76,21 @@ export class userService {
         };
     };  
 
+    async getAllOwners(query) {
+        const owners = await Usuario.find({
+            role: "OWNER",
+            $or: [
+            { firstName: { $regex: query, $options: "i" } },
+            { lastName: { $regex: query, $options: "i" } }
+            ]
+        })
+            .select("_id firstName lastName email")
+            .limit(10);
+
+        return owners;
+    };
+
+
         // EDITAR DATOS DE UN USUARIO
     async updateUser(ownerId, updateData) {
         try{

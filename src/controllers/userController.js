@@ -42,7 +42,10 @@ export const registerVetController = async (req, res) => {
             photoUrl = result.secure_url;
         };
 
-        const newVet = await us.registerVet(firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl);
+        let parsedWorkSchedule = workSchedule;
+        if (workSchedule) {parsedWorkSchedule = JSON.parse(workSchedule)};
+
+        const newVet = await us.registerVet(firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, parsedWorkSchedule, photoUrl);
         
         res.status(201).json({
           message: "Success",
@@ -92,19 +95,23 @@ export const renovateTokenController = async (req, res) => {
     }
 };
 
-    // OBTENER TODOS LOS USUARIOS (SECRETARY, ADMIN)
-export const getAllUsersController = async (req, res) => {
+        // OBTENER TODOS LOS OWNERS (SECRETARY, ADMIN) 
+    export const getAllOwnersController = async (req, res) => {
     try{
-        const users = await Usuario.find()
+        const { query } = req.query;
+        if (!query || query.length < 2) return res.json([]);
+        const owners = await us.getAllOwners(query);
+
         res.status(200).json({
-            message: "success",
-            code: 200,
-            data: users
+        message: "success",
+        code: 200,
+        data: owners
         });
     }catch(error){
-        res.status(500).json(error.message);
-    }
+        res.status(500).json({ message: error.message });
+    };
 };
+
 
     // OBTENER TODOS LOS VETERINARIOS (SECRETARY, ADMIN)
 export const getAllVetsController = async (req, res) => {

@@ -1,7 +1,7 @@
 import express from "express";
 import { registerUserController, registerVetController, 
         loginController, renovateTokenController, 
-        getAllUsersController, getAllVetsController, 
+        getAllOwnersController, getAllVetsController, 
         updateUserController, updateVetController,
         deleteUserController, deleteVetController
          } from "../controllers/userController.js"
@@ -29,8 +29,8 @@ userRouter.post("/register", authMiddleware, authRolesMiddleware(["ADMIN", "SECR
 // Registrar Veterinario
 userRouter.post("/vet/register", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), upload.single("photo"), registerValidation, validationMiddleware, registerVetController);
 
-// Listar todos los usuarios
-userRouter.get("/allusers", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getAllUsersController)
+// Listar todos los owners
+userRouter.get("/allowners", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getAllOwnersController)
 
 // Listar todos los vets
 userRouter.get("/allvets", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getAllVetsController);

@@ -42,11 +42,12 @@ export const getPetDetailsController = async (req, res) => {
 
     // CREAR NUEVA MASCOTA
 export const createPetController = async (req, res) => {
+
   try {
     const ownerId =
       req.user.role === "OWNER"
         ? req.user.id
-        : req.body.ownerId;
+        : req.body.owner;
 
     const petData = req.body;    // body del request, es decir, datos ingresados y procesados por el service
 
