@@ -3,17 +3,6 @@ import Mascota from "../models/petModel.js"
 
 export class petService {
     
-        // OBTENER MASCOTAS POR DUEÑO
-    async getAllPets(ownerId) {
-        const pets = await Mascota.find({ owner : ownerId });  // busca owner por su Id
-        return pets
-    };
-
-    async getPetDetails(petId){
-        const pet = await Mascota.findById(petId);
-        return pet 
-    };
-
         // CREAR MASCOTA
     async createPet(petData, ownerId) {
         const newPet = await Mascota.create({

@@ -1,9 +1,24 @@
 import { petService } from "../services/petService.js"
+import Mascota from "../models/petModel.js"
 
 const ps = new petService();
 
-    // VER TODAS LAS MASCOTAS del owner
+    // OBTENER TODAS LAS MASCOTAS (SECRETARY, ADMIN)
 export const getAllPetsController = async (req, res) => {
+    try{
+        const pets = await Mascota.find().populate("owner", "firstName lastName");
+        res.status(200).json({
+            message: "success",
+            code: 200,
+            data: pets
+        });
+    }catch(error){
+        res.status(500).json(error.message);
+    }
+};
+
+    // VER TODAS LAS MASCOTAS del owner
+export const getAllOwnerPetsController = async (req, res) => {
   try {
       const ownerId =
       req.user.role === "OWNER"
@@ -11,7 +26,7 @@ export const getAllPetsController = async (req, res) => {
         : req.body.ownerId;
 
     // const ownerId = req.params.ownerId;     // extraer del req los parametros 
-    const pets = await ps.getAllPets(ownerId); // pedir al service que encuentre las mascotas del owner con ese id
+    const pets = await Mascota.find({ owner : ownerId });  // busca owner por su Id
 
     res.status(200).json({
       message: "Mascotas obtenidas",
@@ -26,7 +41,7 @@ export const getAllPetsController = async (req, res) => {
 export const getPetDetailsController = async (req, res) => {
   try{
     const { petId } = req.params;    // busco la id de la mascota
-    const pet = await ps.getPetDetails(petId)   // pregunto a Mongo si encuentra los DATOS de un Pet con ese Id
+    const pet = await Mascota.findById(petId);  // pregunto a Mongo si encuentra los DATOS de un Pet con ese Id
     if (!pet) {
       return res.status(404).json({ message: "Mascota no encontrada" });
     }

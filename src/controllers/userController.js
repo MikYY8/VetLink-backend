@@ -112,6 +112,20 @@ export const renovateTokenController = async (req, res) => {
     };
 };
 
+    // OBTENER TODOS LOS USUARIOS (SECRETARY, ADMIN)
+export const getAllUsersController = async (req, res) => {
+    try{
+        const users = await Usuario.find()
+        res.status(200).json({
+            message: "success",
+            code: 200,
+            data: users
+        });
+    }catch(error){
+        res.status(500).json(error.message);
+    }
+};
+
 
     // OBTENER TODOS LOS VETERINARIOS (SECRETARY, ADMIN)
 export const getAllVetsController = async (req, res) => {
@@ -131,7 +145,7 @@ export const getAllVetsController = async (req, res) => {
 export const updateUserController = async (req, res) => {
     try{
         const { ownerId } = req.params;
-        const user = await Usuario.find({ownerId})
+        const user = await Usuario.findById(ownerId)
         const updateData = req.body;
     // 🔒 BLOQUEO DE ROLES
         if (req.user.role === "SECRETARY" && ownerId.role === "ADMIN") {
@@ -184,6 +198,47 @@ export const deleteUserController = async (req, res) => {
         res.status(500).json(error.message);
     };
 };
+
+// OBTENER UN OWNER POR ID (para editar)
+export const getUserByIdController = async (req, res) => {
+  try {
+    const { ownerId } = req.params;
+
+    const user = await Usuario.findById(ownerId).select("firstName lastName email role");
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.status(200).json({
+      message: "success",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// OBTENER UN VET POR ID (para editar)
+export const getVetByIdController = async (req, res) => {
+  try {
+    const { vetId } = req.params;
+
+    const vet = await Veterinario.findById(vetId).select("firstName lastName email licenseNumber specialty acceptsConsultations phone workSchedule");
+
+    if (!vet) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.status(200).json({
+      message: "success",
+      data: vet,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
     // ELIMINAR VETERINARIO (SECRETARY, ADMIN)
 export const deleteVetController = async (req, res) => {

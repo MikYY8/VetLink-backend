@@ -3,8 +3,9 @@ import { registerUserController, registerVetController,
         loginController, renovateTokenController, 
         getAllOwnersController, getAllVetsController, 
         updateUserController, updateVetController,
-        deleteUserController, deleteVetController
-         } from "../controllers/userController.js"
+        getUserByIdController, getVetByIdController, 
+        deleteUserController, deleteVetController, 
+        getAllUsersController } from "../controllers/userController.js"
 import { registerValidation, loginValidation } from "../validations/userValidation.js";
 import { validationMiddleware } from "../middlewares/validationMiddleware.js";
 import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js" // (["OWNER", "ADMIN", "SECRETARY"])
@@ -32,11 +33,20 @@ userRouter.post("/vet/register", authMiddleware, authRolesMiddleware(["ADMIN", "
 // Listar todos los owners
 userRouter.get("/allowners", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getAllOwnersController)
 
+// Listar todos los usuarios
+userRouter.get("/allusers", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getAllUsersController)
+
 // Listar todos los vets
 userRouter.get("/allvets", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getAllVetsController);
 
 // Editar un usuario
 userRouter.put("/update-user/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), updateUserController)
+
+// Obtener un usuario por id (para editar)
+userRouter.get("/get-user/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getUserByIdController);
+
+// Obtener un veterinario por id (para editar)
+userRouter.get("/get-vet/:vetId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getVetByIdController);
 
 // Eliminar un usuario
 userRouter.delete("/delete-user/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), deleteUserController)
