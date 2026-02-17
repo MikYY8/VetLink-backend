@@ -11,6 +11,8 @@ import { generateAvailabilityController,
         getAppointmentsHistoryController,
         createAppointmentController,
         updateAppointmentStatusController,
+        getVetsByAppointmentTypeController,
+        getVaccinesBySpeciesController
         } from "../controllers/appointmentController.js";
 
 const appointmentRouter = express.Router();
@@ -41,5 +43,11 @@ appointmentRouter.post("/make-appointment", authMiddleware, authRolesMiddleware(
 
 // Editar status de turno como COMPLETED / CANCELLED
 appointmentRouter.patch("/status/:appointmentId", authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"]), updateAppointmentStatusController)
+
+// Traer veterinarios por tipo de turno
+appointmentRouter.get("/vets-by-type", authMiddleware, getVetsByAppointmentTypeController);
+
+// Traer vacunas segun especie
+appointmentRouter.get("/vaccines", authMiddleware, getVaccinesBySpeciesController);
 
 export default appointmentRouter

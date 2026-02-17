@@ -13,7 +13,7 @@ export class appointmentService {
     async getAvailableAppointments ({ date, specialty, vetId }) {
         if (!date) throw new Error("La fecha es obligatoria");
 
-        const query = {date, isAvailable: true};
+        const query = {date, available: true};
 
         // Filtrar por veterinario
         if (vetId) query.vet = vetId;
@@ -40,6 +40,10 @@ export class appointmentService {
             time,
             available: true,
         }));
+
+        const existing = await BloqueDisponible.find({ vet: vetId, date });
+        if (existing.length > 0) return;    
+
 
         return await BloqueDisponible.insertMany(allBlocks);
     };

@@ -35,7 +35,7 @@ const vetSchema = new mongoose.Schema({
             "SURGERY",
             "DERMATOLOGY",
             "CARDIOLOGY",
-            "TRAUMATOLOGY",
+            "ONCOLOGY",
         ],
         required: true,
     },

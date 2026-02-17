@@ -2,6 +2,7 @@ import express from 'express'
 import 'dotenv/config'
 import mongoose from 'mongoose'
 import cors from "cors"
+import "./src/utils/scheduler.js"
 
 import userRouter from "./src/routes/userRoutes.js"
 import vetRoutes from "./src/routes/vetRoutes.js";

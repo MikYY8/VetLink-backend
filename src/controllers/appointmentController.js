@@ -1,4 +1,5 @@
 import { appointmentService } from "../services/appointmentService.js"
+import { dogVaccines, catVaccines } from "../utils/vaccineCatalog.js";
 
 const as = new appointmentService();
 
@@ -172,4 +173,39 @@ export const getAppointmentsHistoryController = async (req, res) => {
   }catch(error){
     res.status(400).json({ message: error.message });
   }
+};
+
+export const getVetsByAppointmentTypeController = async (req, res) => {
+  try {
+    const { type } = req.query;
+
+    let filter = {};
+
+    if (type === "CONSULTATION") {
+      filter.specialty = "GENERAL";
+    }
+
+    if (type === "SURGERY") {
+      filter.specialty = "SURGERY";
+    }
+
+    if (type === "CONTROL" || type === "VACCINATION") {
+      filter.specialty = { $ne: "SURGERY" };
+    }
+
+    const vets = await Veterinario.find(filter);
+
+    res.status(200).json({ data: vets });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getVaccinesBySpeciesController = (req, res) => {
+    const { species } = req.query;
+
+    if (species === "DOG") return res.json({ data: dogVaccines });
+    if (species === "CAT") return res.json({ data: catVaccines });
+
+    res.status(400).json({ message: "Especie inválida" });
 };
