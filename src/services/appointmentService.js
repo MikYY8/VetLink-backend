@@ -52,11 +52,17 @@ export class appointmentService {
     async createAppointment({ petId, vetId, ownerId, date, time, type, details, vaccineName }) {
 
         //  VERIFICACION 1: Verificar bloque disponible
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0,0,0,0);
+
+        const endOfDay = new Date(date);
+        endOfDay.setHours(23,59,59,999);
+
         const block = await BloqueDisponible.findOne({
             vet: vetId,
-            date,
             time,
             available: true,
+            date: { $gte: startOfDay, $lte: endOfDay }
         });
 
         if (!block) throw new Error("El turno ya no está disponible");
@@ -96,7 +102,7 @@ export class appointmentService {
             type,
             vaccineName: type == "VACCINATION" ? vaccineName : null,
             details,
-            price: 100,
+            // price,
             status: "SCHEDULED",
         });
 

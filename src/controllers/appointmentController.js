@@ -1,5 +1,6 @@
 import { appointmentService } from "../services/appointmentService.js"
 import { dogVaccines, catVaccines } from "../utils/vaccineCatalog.js";
+import Veterinario from "../models/vetModel.js";
 
 const as = new appointmentService();
 

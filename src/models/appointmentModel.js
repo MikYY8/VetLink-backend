@@ -35,10 +35,10 @@ const appointmentSchema = new mongoose.Schema({
     details: {
         type: String
     },
-    price: {
-        type: Number,
-        required: true,
-    },
+    // price: {
+    //     type: Number,
+    //     required: true,
+    // },
     status: {
         type: String,
         enum: ["AVAILABLE", "SCHEDULED", "CANCELLED", "COMPLETED"],
