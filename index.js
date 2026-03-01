@@ -25,6 +25,7 @@ const corsOptions = {  // origin: ["http://localhost:5173", "https://TU-FRONT.ne
 
 app.use(express.json());
 app.use(cors(corsOptions));
+// app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.send('Working on the Vet app');
@@ -45,7 +46,7 @@ mongoose.connect(process.env.MONGOURL).then(()=>{
   console.log(error)
 });
 
-app.listen(PORT, () => {
+// app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Running in http://localhost:${PORT}`)
 });
-

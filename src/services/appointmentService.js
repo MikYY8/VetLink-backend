@@ -264,6 +264,14 @@ export class appointmentService {
         return appointments;
     };
 
+    async getAppointmentDetails(appointmentId) {
+        const appointment = await Turno.findById(appointmentId,{details:1,price:1})
+
+        if (!appointment) throw new Error("Turno no encontrado");
+
+        return appointment;
+    }
+
         // Obtener turnos del owner
     async getOwnerAppointments({ ownerId, status }) {
         const filter = { owner: ownerId };
@@ -297,5 +305,15 @@ export class appointmentService {
 
         return history;
     };
-    
+
+    async updateAvailabilityBlock(availabilityBlockId, updateData) {
+        const availabilityBlock = await BloqueDisponible.findById(availabilityBlockId);
+        
+        if (!availabilityBlock) throw new Error("Bloque no encontrado");
+
+        Object.assign(availabilityBlock, updateData);
+        await availabilityBlock.save();
+        return availabilityBlock;
+    };
 };
+

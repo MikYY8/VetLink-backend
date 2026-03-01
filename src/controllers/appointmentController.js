@@ -140,6 +140,21 @@ export const getDashboardController = async (req, res) => {
   }
 };
 
+export const getAppointmentDetailsController = async (req, res) => {
+  try{
+    const { appointmentId } = req.params;
+
+    const updated = await as.getAppointmentDetails(appointmentId);
+
+    res.status(200).json({
+      message: "Detalles del turno",
+      data: updated,
+    });
+    }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+}
+
   // OBTENER TURNOS DEL OWNER (con filtro de estado, lo ideal seria solo traer los SCHEDULED y luego hacer un historial para los COMPLETED/CANCELLED)
 export const getOwnerAppointmentsController = async (req, res) => {
   try{
@@ -209,4 +224,21 @@ export const getVaccinesBySpeciesController = (req, res) => {
     if (species === "CAT") return res.json({ data: catVaccines });
 
     res.status(400).json({ message: "Especie inválida" });
+};
+
+  // MODIFICAR ESTADO DE TURNOS a COMPLETED (solo vets) o CANCELLED (owners, secres, admins)
+export const updateAvailabilityBlockController = async (req, res) => {
+  try{ 
+    const { availabilityBlockId } = req.params;
+    const updateData = req.body;
+
+    const updated = await as.updateAvailabilityBlock(availabilityBlockId, updateData);
+
+    res.status(200).json({
+      message: "Estado del bloque actualizado",
+      data: updated,
+    });
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  }
 };

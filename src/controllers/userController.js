@@ -61,6 +61,7 @@ export const registerVetController = async (req, res) => {
 export const loginController = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log(req.body)
         const { accesstoken, refreshtoken } = await us.login(email, password);
         res.set({
             Authorization: `Bearer ${accesstoken}`,

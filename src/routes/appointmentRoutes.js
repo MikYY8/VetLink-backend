@@ -7,12 +7,14 @@ import { generateAvailabilityController,
         getVetAgendaController,
         getVetDailyAgendaController,
         getDashboardController,
+        getAppointmentDetailsController,
         getOwnerAppointmentsController,
         getAppointmentsHistoryController,
         createAppointmentController,
         updateAppointmentStatusController,
         getVetsByAppointmentTypeController,
-        getVaccinesBySpeciesController
+        getVaccinesBySpeciesController,
+        updateAvailabilityBlockController
         } from "../controllers/appointmentController.js";
 
 const appointmentRouter = express.Router();
@@ -38,6 +40,9 @@ appointmentRouter.get("/vet-agenda/today", authMiddleware, authRolesMiddleware([
 // Ver dashboard de la secretaria
 appointmentRouter.get("/dashboard", authMiddleware, authRolesMiddleware(["SECRETARY", "ADMIN"]), getDashboardController)
 
+// Ver detalles de un turno
+appointmentRouter.get("/dashboard/details/:appointmentId", authMiddleware, authRolesMiddleware(["SECRETARY", "ADMIN"]), getAppointmentDetailsController)
+
 // Crear turno (PARA OWNERS / SECRETARIES / ADMINS)
 appointmentRouter.post("/make-appointment", authMiddleware, authRolesMiddleware(["OWNER", "SECRETARY", "ADMIN"]), createAppointmentController);
 
@@ -49,5 +54,9 @@ appointmentRouter.get("/vets-by-type", authMiddleware, getVetsByAppointmentTypeC
 
 // Traer vacunas segun especie
 appointmentRouter.get("/vaccines", authMiddleware, getVaccinesBySpeciesController);
+
+// Bloquear turnos para que no se puedan reservar
+appointmentRouter.patch("/block/:availabilityBlockId", authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"]), updateAvailabilityBlockController)
+
 
 export default appointmentRouter
