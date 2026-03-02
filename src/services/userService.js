@@ -18,13 +18,13 @@ export class userService {
     };
 
         // REGISTRAR VETERINARIO
-    async registerVet (firstName, lastName, email, password, licenseNumber, specialty, workSchedule, acceptsConsultations){
+    async registerVet (firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl){
         const existingVet = await Veterinario.findOne({ email });
         if(existingVet){
             throw new Error("E-mail ya registrado");
         };
 
-        const newVet = await Veterinario.create({ firstName, lastName, email, password, licenseNumber, specialty, workSchedule, acceptsConsultations })
+        const newVet = await Veterinario.create({ firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl })
         
         return newVet;
     };
@@ -37,11 +37,11 @@ export class userService {
                 account = await Veterinario.findOne({ email });
             };
             if (!account) {
-                throw new Error("Email o contraseña incorrectos");
+                throw new Error("No se encontró el usuario 44444");
             };
             const passwordValid = await bcrypt.compare(password, account.password);
             if (!passwordValid) {
-                throw new Error("Email o contraseña incorrectos");
+                throw new Error("Email o contraseña incorrectos 555555");
             };
             const accesstoken = generateAccessToken({
                 id: account._id,
@@ -75,6 +75,21 @@ export class userService {
             throw new Error(error);
         };
     };  
+
+    async getAllOwners(query) {
+        const owners = await Usuario.find({
+            role: "OWNER",
+            $or: [
+            { firstName: { $regex: query, $options: "i" } },
+            { lastName: { $regex: query, $options: "i" } }
+            ]
+        })
+            .select("_id firstName lastName email")
+            .limit(10);
+
+        return owners;
+    };
+
 
         // EDITAR DATOS DE UN USUARIO
     async updateUser(ownerId, updateData) {

@@ -35,7 +35,7 @@ const vetSchema = new mongoose.Schema({
             "SURGERY",
             "DERMATOLOGY",
             "CARDIOLOGY",
-            "TRAUMATOLOGY",
+            "ONCOLOGY",
         ],
         required: true,
     },
@@ -46,12 +46,12 @@ const vetSchema = new mongoose.Schema({
     phone: {
         type:String,
     },
-    photoUrl: {
-        type: String,
-    },
     workSchedule: {
         start: { type: String }, // "09:00"
         end: { type: String },   // "17:00"
+    },
+    photoUrl: {
+        type: String,
     },
     role: {
       type: String,

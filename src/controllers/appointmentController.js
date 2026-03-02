@@ -1,12 +1,29 @@
 import { appointmentService } from "../services/appointmentService.js"
+import { dogVaccines, catVaccines } from "../utils/vaccineCatalog.js";
+import Veterinario from "../models/vetModel.js";
 
 const as = new appointmentService();
 
-    // OBTENER TURNOS DISPONIBLES (NO crea, solo MUESTRA)
+    // OBTENER BLOQUES DE TURNOS DISPONIBLES, se usa para VER HORARIOS DISPONIBLES, BLOQUEARLOS, VER RAZONES (NO crea, solo MUESTRA)
 export const getAvailableAppointmentsController = async (req, res) => {
   try{
     const { date, specialty, vetId } = req.query;
     const available = await as.getAvailableAppointments({date, specialty, vetId});
+
+    res.status(200).json({
+      message: "Turnos disponibles",
+      data: available,
+    });
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  };
+};
+
+    // OBTENER SOLO TURNOS DISPONIBLES, se usa para AGENDAR TURNOS (NO crea, solo MUESTRA)
+export const getOnlyAvailableAppointmentsController = async (req, res) => {
+  try{
+    const { date, specialty, vetId } = req.query;
+    const available = await as.getOnlyAvailableAppointments({date, specialty, vetId});
 
     res.status(200).json({
       message: "Turnos disponibles",
@@ -138,6 +155,21 @@ export const getDashboardController = async (req, res) => {
   }
 };
 
+export const getAppointmentDetailsController = async (req, res) => {
+  try{
+    const { appointmentId } = req.params;
+
+    const updated = await as.getAppointmentDetails(appointmentId);
+
+    res.status(200).json({
+      message: "Detalles del turno",
+      data: updated,
+    });
+    }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+}
+
   // OBTENER TURNOS DEL OWNER (con filtro de estado, lo ideal seria solo traer los SCHEDULED y luego hacer un historial para los COMPLETED/CANCELLED)
 export const getOwnerAppointmentsController = async (req, res) => {
   try{
@@ -168,6 +200,58 @@ export const getAppointmentsHistoryController = async (req, res) => {
     res.status(200).json({
       message: "Turnos pasados",
       data: history,
+    });
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const getVetsByAppointmentTypeController = async (req, res) => {
+  try {
+    const { type } = req.query;
+
+    let filter = {};
+
+    if (type === "CONSULTATION") {
+      filter.specialty = "GENERAL";
+    }
+
+    if (type === "SURGERY") {
+      filter.specialty = "SURGERY";
+    }
+
+    if (type === "CONTROL" || type === "VACCINATION") {
+      filter.specialty = { $ne: "SURGERY" };
+    }
+
+    const vets = await Veterinario.find(filter);
+
+    res.status(200).json({ data: vets });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getVaccinesBySpeciesController = (req, res) => {
+    const { species } = req.query;
+
+    if (species === "DOG") return res.json({ data: dogVaccines });
+    if (species === "CAT") return res.json({ data: catVaccines });
+
+    res.status(400).json({ message: "Especie inválida" });
+};
+
+  // MODIFICAR ESTADO DE TURNOS a COMPLETED (solo vets) o CANCELLED (owners, secres, admins)
+export const updateAvailabilityBlockController = async (req, res) => {
+  try{ 
+    const { availabilityBlockId } = req.params;
+    const updateData = req.body;
+
+    const updated = await as.updateAvailabilityBlock(availabilityBlockId, updateData);
+
+    res.status(200).json({
+      message: "Estado del bloque actualizado",
+      data: updated,
     });
   }catch(error){
     res.status(400).json({ message: error.message });

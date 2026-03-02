@@ -13,7 +13,27 @@ export class appointmentService {
     async getAvailableAppointments ({ date, specialty, vetId }) {
         if (!date) throw new Error("La fecha es obligatoria");
 
-        const query = {date, isAvailable: true};
+        const query = {date};
+
+        // Filtrar por veterinario
+        if (vetId) query.vet = vetId;
+
+        // Filtrar por especialidad
+        if (specialty) {
+            const vets = await Veterinario.find({ specialty }).select("_id");
+            query.vet = { $in: vets.map(v => v._id) };
+        };
+
+        const availableBlocks = await BloqueDisponible.find(query)
+            .populate("vet", "firstName lastName specialty");
+
+        return availableBlocks;
+    };
+
+    async getOnlyAvailableAppointments ({ date, specialty, vetId }) {
+        if (!date) throw new Error("La fecha es obligatoria");
+
+        const query = {date, available: true};
 
         // Filtrar por veterinario
         if (vetId) query.vet = vetId;
@@ -41,6 +61,10 @@ export class appointmentService {
             available: true,
         }));
 
+        const existing = await BloqueDisponible.find({ vet: vetId, date });
+        if (existing.length > 0) return;    
+
+
         return await BloqueDisponible.insertMany(allBlocks);
     };
 
@@ -48,11 +72,17 @@ export class appointmentService {
     async createAppointment({ petId, vetId, ownerId, date, time, type, details, vaccineName }) {
 
         //  VERIFICACION 1: Verificar bloque disponible
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0,0,0,0);
+
+        const endOfDay = new Date(date);
+        endOfDay.setHours(23,59,59,999);
+
         const block = await BloqueDisponible.findOne({
             vet: vetId,
-            date,
             time,
             available: true,
+            date: { $gte: startOfDay, $lte: endOfDay }
         });
 
         if (!block) throw new Error("El turno ya no está disponible");
@@ -92,7 +122,7 @@ export class appointmentService {
             type,
             vaccineName: type == "VACCINATION" ? vaccineName : null,
             details,
-            price: 100,
+            // price,
             status: "SCHEDULED",
         });
 
@@ -254,6 +284,14 @@ export class appointmentService {
         return appointments;
     };
 
+    async getAppointmentDetails(appointmentId) {
+        const appointment = await Turno.findById(appointmentId,{details:1,price:1})
+
+        if (!appointment) throw new Error("Turno no encontrado");
+
+        return appointment;
+    }
+
         // Obtener turnos del owner
     async getOwnerAppointments({ ownerId, status }) {
         const filter = { owner: ownerId };
@@ -287,5 +325,15 @@ export class appointmentService {
 
         return history;
     };
-    
+
+    async updateAvailabilityBlock(availabilityBlockId, updateData) {
+        const availabilityBlock = await BloqueDisponible.findById(availabilityBlockId);
+        
+        if (!availabilityBlock) throw new Error("Bloque no encontrado");
+
+        Object.assign(availabilityBlock, updateData);
+        await availabilityBlock.save();
+        return availabilityBlock;
+    };
 };
+

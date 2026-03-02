@@ -1,21 +1,25 @@
 import express from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js"; // token valido 
 import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js" // (["OWNER", "ADMIN", "SECRETARY"])
-import { getAllPetsController, getPetDetailsController, createPetController, updatePetController, deletePetController } from "../controllers/petController.js"
+import { getAllPetsController, getAllOwnerPetsController, getPetDetailsController, createPetController, updatePetController, deletePetController } from "../controllers/petController.js"
+import upload from "../middlewares/upload.js";
 
 const ownerRouter = express.Router();
 
+// Ver todas las mascotas (SECRETARY / ADMIN)
+ownerRouter.get("/allpets", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getAllPetsController);
+
 // Ver mascotas por owner (SECRETARY / ADMIN)
-ownerRouter.get("/pets/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "OWNER"]), getAllPetsController);
+ownerRouter.get("/pets/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "OWNER"]), getAllOwnerPetsController);
 
 // Ver una sola mascota
 ownerRouter.get("/pets/mypet/:petId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "OWNER"]), getPetDetailsController);
 
 // Crear mascota (OWNER crea sus mascotas, SECRETARY O ADMIN pueden crear mascotas para cualquier owner)
-ownerRouter.post("/pets/add", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "OWNER"]), createPetController);
+ownerRouter.post("/pets/add", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "OWNER"]), upload.single("photo"), createPetController);
 
 // Editar mascota (OWNER / SECRETARY / ADMIN)
-ownerRouter.put("/pets/:petId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "OWNER"]), updatePetController);
+ownerRouter.put("/pets/:petId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "OWNER"]), upload.single("photo"), updatePetController);
 
 // Eliminar (desactivar) mascota (OWNER / SECRETARY / ADMIN)
 ownerRouter.delete("/pets/:petId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "OWNER"]), deletePetController);

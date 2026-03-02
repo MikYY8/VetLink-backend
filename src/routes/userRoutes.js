@@ -1,14 +1,16 @@
 import express from "express";
 import { registerUserController, registerVetController, 
         loginController, renovateTokenController, 
-        getAllUsersController, getAllVetsController, 
+        getAllOwnersController, getAllVetsController, 
         updateUserController, updateVetController,
-        deleteUserController, deleteVetController
-         } from "../controllers/userController.js"
+        getUserByIdController, getVetByIdController, 
+        deleteUserController, deleteVetController, 
+        getAllUsersController } from "../controllers/userController.js"
 import { registerValidation, loginValidation } from "../validations/userValidation.js";
 import { validationMiddleware } from "../middlewares/validationMiddleware.js";
 import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js" // (["OWNER", "ADMIN", "SECRETARY"])
 import { authMiddleware } from "../middlewares/authMiddleware.js";
+import upload from "../middlewares/upload.js";
 
 const userRouter = express.Router();
 
@@ -26,7 +28,10 @@ userRouter.post("/token", renovateTokenController);
 userRouter.post("/register", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), registerValidation, validationMiddleware, registerUserController);
 
 // Registrar Veterinario
-userRouter.post("/vet/register", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), registerValidation, validationMiddleware, registerVetController);
+userRouter.post("/vet/register", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), upload.single("photo"), registerValidation, validationMiddleware, registerVetController);
+
+// Listar todos los owners
+userRouter.get("/allowners", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getAllOwnersController)
 
 // Listar todos los usuarios
 userRouter.get("/allusers", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getAllUsersController)
@@ -36,6 +41,12 @@ userRouter.get("/allvets", authMiddleware, authRolesMiddleware(["ADMIN", "SECRET
 
 // Editar un usuario
 userRouter.put("/update-user/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), updateUserController)
+
+// Obtener un usuario por id (para editar)
+userRouter.get("/get-user/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getUserByIdController);
+
+// Obtener un veterinario por id (para editar)
+userRouter.get("/get-vet/:vetId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getVetByIdController);
 
 // Eliminar un usuario
 userRouter.delete("/delete-user/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), deleteUserController)

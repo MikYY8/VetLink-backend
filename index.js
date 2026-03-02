@@ -2,6 +2,7 @@ import express from 'express'
 import 'dotenv/config'
 import mongoose from 'mongoose'
 import cors from "cors"
+import "./src/utils/scheduler.js"
 
 import userRouter from "./src/routes/userRoutes.js"
 import vetRoutes from "./src/routes/vetRoutes.js";
@@ -16,14 +17,15 @@ const PORT = process.env.PORT || 3000
 // const JWT_ACCESS = process.env.JWT_ACCESS
 
 const corsOptions = {  // origin: ["http://localhost:5173", "https://TU-FRONT.netlify.app"],
-  "origin": ["http://localhost:5173"], // agregar "https://midominio.com.ar" cuando tengamos
-  "methods": "GET,POST,PUT,DELETE",
+  "origin": ["http://localhost:5173"], 
+  "methods": "GET,POST,PATCH,PUT,DELETE",
   "credentials" : true,
   "allowedHeaders": ["Content-Type", "Authorization", "x-refresh-token"]
 };
 
 app.use(express.json());
 app.use(cors(corsOptions));
+// app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.send('Working on the Vet app');
@@ -44,7 +46,7 @@ mongoose.connect(process.env.MONGOURL).then(()=>{
   console.log(error)
 });
 
-app.listen(PORT, () => {
+// app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Running in http://localhost:${PORT}`)
 });
-
