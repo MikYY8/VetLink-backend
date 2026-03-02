@@ -4,11 +4,26 @@ import Veterinario from "../models/vetModel.js";
 
 const as = new appointmentService();
 
-    // OBTENER TURNOS DISPONIBLES (NO crea, solo MUESTRA)
+    // OBTENER BLOQUES DE TURNOS DISPONIBLES, se usa para VER HORARIOS DISPONIBLES, BLOQUEARLOS, VER RAZONES (NO crea, solo MUESTRA)
 export const getAvailableAppointmentsController = async (req, res) => {
   try{
     const { date, specialty, vetId } = req.query;
     const available = await as.getAvailableAppointments({date, specialty, vetId});
+
+    res.status(200).json({
+      message: "Turnos disponibles",
+      data: available,
+    });
+  }catch(error){
+    res.status(400).json({ message: error.message });
+  };
+};
+
+    // OBTENER SOLO TURNOS DISPONIBLES, se usa para AGENDAR TURNOS (NO crea, solo MUESTRA)
+export const getOnlyAvailableAppointmentsController = async (req, res) => {
+  try{
+    const { date, specialty, vetId } = req.query;
+    const available = await as.getOnlyAvailableAppointments({date, specialty, vetId});
 
     res.status(200).json({
       message: "Turnos disponibles",

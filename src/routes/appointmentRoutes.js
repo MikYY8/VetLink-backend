@@ -3,7 +3,8 @@ import { authMiddleware } from "../middlewares/authMiddleware.js"; // token vali
 import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js" // (["OWNER", "ADMIN", "SECRETARY"])
 
 import { generateAvailabilityController, 
-        getAvailableAppointmentsController, 
+        getAvailableAppointmentsController,
+        getOnlyAvailableAppointmentsController,
         getVetAgendaController,
         getVetDailyAgendaController,
         getDashboardController,
@@ -22,8 +23,11 @@ const appointmentRouter = express.Router();
         // PARA TESTEO, generar bloques de disponibilidad por veterinario
 appointmentRouter.post("/availability/generate/:vetId", generateAvailabilityController)
 
+// Ver todos los bloques de turnos (SECRETARIES / ADMINS)
+appointmentRouter.get("/available", authMiddleware, authRolesMiddleware(["OWNER", "SECRETARY", "ADMIN"]), getOnlyAvailableAppointmentsController);
+
 // Ver turnos disponibles (PARA OWNERS / SECRETARIES / ADMINS)
-appointmentRouter.get("/available", authMiddleware, authRolesMiddleware(["OWNER", "SECRETARY", "ADMIN"]), getAvailableAppointmentsController);
+appointmentRouter.get("/available-blocks", authMiddleware, authRolesMiddleware(["OWNER", "SECRETARY", "ADMIN"]), getAvailableAppointmentsController);
 
 // Ver turnos del OWNER
 appointmentRouter.get("/my-appointments", authMiddleware, authRolesMiddleware(["OWNER", "ADMIN"]), getOwnerAppointmentsController)
