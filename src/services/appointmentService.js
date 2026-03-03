@@ -335,5 +335,13 @@ export class appointmentService {
         await availabilityBlock.save();
         return availabilityBlock;
     };
+
+    async getAvailabilityBlock(availabilityBlockId){
+        const availabilityBlock = await BloqueDisponible.findById(availabilityBlockId,{available:1,reason:1})
+
+        if (!availabilityBlock) throw new Error("Bloque no encontrado");
+
+        return availabilityBlock;
+    }
 };
 

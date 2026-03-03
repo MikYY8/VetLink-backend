@@ -15,7 +15,8 @@ import { generateAvailabilityController,
         updateAppointmentStatusController,
         getVetsByAppointmentTypeController,
         getVaccinesBySpeciesController,
-        updateAvailabilityBlockController
+        updateAvailabilityBlockController,
+        getAvailabilityBlockController
         } from "../controllers/appointmentController.js";
 
 const appointmentRouter = express.Router();
@@ -61,6 +62,9 @@ appointmentRouter.get("/vaccines", authMiddleware, getVaccinesBySpeciesControlle
 
 // Bloquear turnos para que no se puedan reservar
 appointmentRouter.patch("/block/:availabilityBlockId", authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"]), updateAvailabilityBlockController)
+
+// Necesito un GET para recibir la informacion actual de los bloques. Que idiota soy
+appointmentRouter.get("/block/:availabilityBlockId", authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"]), getAvailabilityBlockController)
 
 
 export default appointmentRouter
