@@ -241,7 +241,7 @@ export const getVaccinesBySpeciesController = (req, res) => {
     res.status(400).json({ message: "Especie inválida" });
 };
 
-  // MODIFICAR ESTADO DE TURNOS a COMPLETED (solo vets) o CANCELLED (owners, secres, admins)
+  // MODIFICAR ESTADO DE BLOQUE HORARIO (secres, admins)
 export const updateAvailabilityBlockController = async (req, res) => {
   try{ 
     const { availabilityBlockId } = req.params;
@@ -257,3 +257,20 @@ export const updateAvailabilityBlockController = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+// Obtener datos del bloque horario seleccionado
+export const getAvailabilityBlockController = async (req, res) => {
+  try{
+    const { availabilityBlockId } = req.params;
+
+    const availabilityBlock = await as.getAvailabilityBlock(availabilityBlockId);
+
+    res.status(200).json({
+      message: "Datos del bloque horario",
+      data: availabilityBlock,
+    })
+
+  }catch(error){
+    res.status(400).json({ message: error.message })
+  }
+}
