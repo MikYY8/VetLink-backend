@@ -41,10 +41,7 @@ export const getAllOwnerPetsController = async (req, res) => {
 export const getPetDetailsController = async (req, res) => {
   try{
     const { petId } = req.params;    // busco la id de la mascota
-    const pet = await Mascota.findById(petId);  // pregunto a Mongo si encuentra los DATOS de un Pet con ese Id
-    if (!pet) {
-      return res.status(404).json({ message: "Mascota no encontrada" });
-    }
+    const pet = await ps.getPetDetails(petId);  // pregunto a Mongo si encuentra los DATOS de un Pet con ese Id
 
     res.status(200).json({
       message: "Detalles de tu mascota",
@@ -114,3 +111,19 @@ export const deletePetController = async (req, res) => {
     res.status(403).json({ message: error.message });
   }
 };
+
+function calculateBirthDate(age, ageUnit) {
+  const today = new Date();
+  const birthDate = new Date(today);
+
+  if (ageUnit === "MONTHS") {
+    birthDate.setMonth(today.getMonth() - age);
+  }
+
+  if (ageUnit === "YEARS") {
+    birthDate.setFullYear(today.getFullYear() - age);
+  }
+
+  return birthDate;
+}
+
