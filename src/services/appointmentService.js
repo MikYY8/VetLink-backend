@@ -343,5 +343,21 @@ export class appointmentService {
 
         return availabilityBlock;
     }
+
+    async getAvailableDatesByVet(vetId) {
+        const blocks = await BloqueDisponible.find({
+            vet: vetId,
+            available: true,
+            date: { $gte: new Date() }
+        });
+
+        const uniqueDates = [
+            ...new Set(
+            blocks.map(b => b.date.toISOString().split("T")[0])
+            )
+        ];
+
+        return uniqueDates;
+    };
 };
 
