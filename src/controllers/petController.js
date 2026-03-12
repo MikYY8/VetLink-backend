@@ -1,6 +1,8 @@
 import { petService } from "../services/petService.js"
 import Mascota from "../models/petModel.js"
 
+import cloudinary from "../config/cloudinary.js"
+
 const ps = new petService();
 
     // OBTENER TODAS LAS MASCOTAS (SECRETARY, ADMIN)
@@ -54,7 +56,6 @@ export const getPetDetailsController = async (req, res) => {
 
     // CREAR NUEVA MASCOTA
 export const createPetController = async (req, res) => {
-
   try {
     const ownerId =
       req.user.role === "OWNER"
@@ -62,8 +63,14 @@ export const createPetController = async (req, res) => {
         : req.body.owner;
 
     const petData = req.body;    // body del request, es decir, datos ingresados y procesados por el service
+    let photoUrl = null;
+        
+    if(req.file){
+      const result = await cloudinary.uploader.upload(req.file.path);
+      photoUrl = result.secure_url;
+    };
 
-    const newPet = await ps.createPet(petData, ownerId);
+    const newPet = await ps.createPet(petData, ownerId, photoUrl);
 
     res.status(201).json({
       message: "Mascota creada con éxito",
@@ -80,6 +87,12 @@ export const updatePetController = async (req, res) => {
     const { petId } = req.params; 
     const user = req.user;
     const updateData = req.body;
+    let photoUrl = null;
+        
+    if(req.file){
+      const result = await cloudinary.uploader.upload(req.file.path);
+      photoUrl = result.secure_url;
+    };
 
     const updatedPet = await ps.updatePet(
       petId,

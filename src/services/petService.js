@@ -13,10 +13,11 @@ export class petService {
     };
     
         // CREAR MASCOTA
-    async createPet(petData, ownerId) {
+    async createPet(petData, ownerId, photoUrl) {
         const newPet = await Mascota.create({
             ...petData,
             owner: ownerId,
+            photoUrl
         });
         return newPet;
     };

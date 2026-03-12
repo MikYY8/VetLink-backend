@@ -59,7 +59,9 @@ export const registerVetController = async (req, res) => {
 
     // LOGIN DE USUARIOS (OWNER, SECRETARY, ADMIN)
 export const loginController = async (req, res) => {
+    // console.log("BODY 1er intento:", req.body);
     try {
+        // console.log("BODY 2do intento:", req.body);
         const { email, password } = req.body;
         
         const { accesstoken, refreshtoken } = await us.login(email, password);

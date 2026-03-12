@@ -175,11 +175,11 @@ export const getAppointmentDetailsController = async (req, res) => {
 export const getOwnerAppointmentsController = async (req, res) => {
   try{
     const ownerId = req.user.id; 
-    let { status } = req.query;
+    let { status, petId  } = req.query;
 
     if (!status) status = "SCHEDULED";
 
-    const appointments = await as.getOwnerAppointments({ ownerId, status });
+    const appointments = await as.getOwnerAppointments({ ownerId, status, petId });
 
     res.status(200).json({
       message: "Mis turnos",
@@ -194,9 +194,9 @@ export const getOwnerAppointmentsController = async (req, res) => {
 export const getAppointmentsHistoryController = async (req, res) => {
   try{
     const ownerId = req.user.id; 
-    let { status } = req.query;
+    let { status, petId } = req.query;
 
-    const history = await as.getAppointmentsHistory({ ownerId, status });
+    const history = await as.getAppointmentsHistory({ ownerId, status, petId });
 
     res.status(200).json({
       message: "Turnos pasados",

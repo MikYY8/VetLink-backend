@@ -6,7 +6,7 @@ export class prescriptionService {
         // Mostrar todas las recetas de una mascota
     async getPrescriptionByPet(petId){
         const prescription = await Receta.find({ pet: petId })
-        .select("medication notes vet")
+        .select("date medication notes vet")
         .populate("vet", "firstName lastName specialty")
         .sort({ date: -1 });
 
