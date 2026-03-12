@@ -5,9 +5,14 @@ const petSchema = new mongoose.Schema({
         type:String,
         required: true,
     },
-    age:{
-        type:Number,
-        required: true,
+    birthDate: {
+    type: Date,
+    required: true,
+    },
+
+    isEstimated: {
+    type: Boolean,
+    default: false,
     },
     sex:{
         type:String,

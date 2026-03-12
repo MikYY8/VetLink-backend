@@ -1,6 +1,7 @@
 import { appointmentService } from "../services/appointmentService.js"
 import { dogVaccines, catVaccines } from "../utils/vaccineCatalog.js";
 import Veterinario from "../models/vetModel.js";
+import BloqueDisponible from "../models/availabilityBlockModel.js";
 
 const as = new appointmentService();
 
@@ -174,11 +175,11 @@ export const getAppointmentDetailsController = async (req, res) => {
 export const getOwnerAppointmentsController = async (req, res) => {
   try{
     const ownerId = req.user.id; 
-    let { status } = req.query;
+    let { status, petId  } = req.query;
 
     if (!status) status = "SCHEDULED";
 
-    const appointments = await as.getOwnerAppointments({ ownerId, status });
+    const appointments = await as.getOwnerAppointments({ ownerId, status, petId });
 
     res.status(200).json({
       message: "Mis turnos",
@@ -193,9 +194,9 @@ export const getOwnerAppointmentsController = async (req, res) => {
 export const getAppointmentsHistoryController = async (req, res) => {
   try{
     const ownerId = req.user.id; 
-    let { status } = req.query;
+    let { status, petId } = req.query;
 
-    const history = await as.getAppointmentsHistory({ ownerId, status });
+    const history = await as.getAppointmentsHistory({ ownerId, status, petId });
 
     res.status(200).json({
       message: "Turnos pasados",
@@ -272,5 +273,40 @@ export const getAvailabilityBlockController = async (req, res) => {
 
   }catch(error){
     res.status(400).json({ message: error.message })
-  }
+  };
 }
+
+// Obtener fechas con horarios disponibles para sacar turno 
+export const getAvailableDatesByVetController = async (req, res) => {
+  try{
+    const { vetId } = req.params;
+
+    const dates = await as.getAvailableDatesByVet(vetId)
+
+    res.status(200).json({
+      message: "Fechas disponibles",
+      data: dates,
+    })
+
+  }catch(error){
+    res.status(400).json({ message: error.message })
+  };
+};
+
+export const getTimesByVetAndDateController = async (req, res) => {
+  const { vetId, date } = req.params;
+
+  const start = new Date(date);
+  start.setHours(0,0,0,0);
+
+  const end = new Date(date);
+  end.setHours(23,59,59,999);
+
+  const blocks = await BloqueDisponible.find({
+    vet: vetId,
+    available: true,
+    date: { $gte: start, $lte: end }
+  }).sort({ time: 1 });
+
+  res.json(blocks);
+};

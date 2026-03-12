@@ -24,7 +24,12 @@ const corsOptions = {  // origin: ["http://localhost:5173", "https://TU-FRONT.ne
 };
 
 app.use(express.json());
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors());  // temporal, para que RN me de bola
+
+
+
+
 // app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {

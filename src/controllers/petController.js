@@ -1,6 +1,8 @@
 import { petService } from "../services/petService.js"
 import Mascota from "../models/petModel.js"
 
+import cloudinary from "../config/cloudinary.js"
+
 const ps = new petService();
 
     // OBTENER TODAS LAS MASCOTAS (SECRETARY, ADMIN)
@@ -41,10 +43,7 @@ export const getAllOwnerPetsController = async (req, res) => {
 export const getPetDetailsController = async (req, res) => {
   try{
     const { petId } = req.params;    // busco la id de la mascota
-    const pet = await Mascota.findById(petId);  // pregunto a Mongo si encuentra los DATOS de un Pet con ese Id
-    if (!pet) {
-      return res.status(404).json({ message: "Mascota no encontrada" });
-    }
+    const pet = await ps.getPetDetails(petId);  // pregunto a Mongo si encuentra los DATOS de un Pet con ese Id
 
     res.status(200).json({
       message: "Detalles de tu mascota",
@@ -57,7 +56,6 @@ export const getPetDetailsController = async (req, res) => {
 
     // CREAR NUEVA MASCOTA
 export const createPetController = async (req, res) => {
-
   try {
     const ownerId =
       req.user.role === "OWNER"
@@ -65,8 +63,14 @@ export const createPetController = async (req, res) => {
         : req.body.owner;
 
     const petData = req.body;    // body del request, es decir, datos ingresados y procesados por el service
+    let photoUrl = null;
+        
+    if(req.file){
+      const result = await cloudinary.uploader.upload(req.file.path);
+      photoUrl = result.secure_url;
+    };
 
-    const newPet = await ps.createPet(petData, ownerId);
+    const newPet = await ps.createPet(petData, ownerId, photoUrl);
 
     res.status(201).json({
       message: "Mascota creada con éxito",
@@ -83,6 +87,12 @@ export const updatePetController = async (req, res) => {
     const { petId } = req.params; 
     const user = req.user;
     const updateData = req.body;
+    let photoUrl = null;
+        
+    if(req.file){
+      const result = await cloudinary.uploader.upload(req.file.path);
+      photoUrl = result.secure_url;
+    };
 
     const updatedPet = await ps.updatePet(
       petId,
@@ -114,3 +124,19 @@ export const deletePetController = async (req, res) => {
     res.status(403).json({ message: error.message });
   }
 };
+
+function calculateBirthDate(age, ageUnit) {
+  const today = new Date();
+  const birthDate = new Date(today);
+
+  if (ageUnit === "MONTHS") {
+    birthDate.setMonth(today.getMonth() - age);
+  }
+
+  if (ageUnit === "YEARS") {
+    birthDate.setFullYear(today.getFullYear() - age);
+  }
+
+  return birthDate;
+}
+

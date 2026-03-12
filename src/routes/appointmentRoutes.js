@@ -16,7 +16,9 @@ import { generateAvailabilityController,
         getVetsByAppointmentTypeController,
         getVaccinesBySpeciesController,
         updateAvailabilityBlockController,
-        getAvailabilityBlockController
+        getAvailabilityBlockController,
+        getAvailableDatesByVetController,
+        getTimesByVetAndDateController
         } from "../controllers/appointmentController.js";
 
 const appointmentRouter = express.Router();
@@ -65,6 +67,12 @@ appointmentRouter.patch("/block/:availabilityBlockId", authMiddleware, authRoles
 
 // Necesito un GET para recibir la informacion actual de los bloques. Que idiota soy
 appointmentRouter.get("/block/:availabilityBlockId", authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"]), getAvailabilityBlockController)
+
+// Obtener fechas con horarios disponibles, para sacar turnos
+appointmentRouter.get("/availability/dates/:vetId", authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"]), getAvailableDatesByVetController);
+
+// Despues horarios de las fechas, compatible con la función anterior
+appointmentRouter.get("/availability/times/:vetId/:date", authMiddleware, authRolesMiddleware(["VET", "OWNER", "SECRETARY", "ADMIN"]), getTimesByVetAndDateController);
 
 
 export default appointmentRouter

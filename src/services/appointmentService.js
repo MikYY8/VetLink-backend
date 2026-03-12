@@ -293,23 +293,25 @@ export class appointmentService {
     }
 
         // Obtener turnos del owner
-    async getOwnerAppointments({ ownerId, status }) {
+    async getOwnerAppointments({ ownerId, status, petId }) {
         const filter = { owner: ownerId };
+        if (petId) filter.pet = petId;
 
         // filtro por estado
         if (status) filter.status = status.trim();
         
         const appointments = await Turno.find(filter)
             .populate("vet", "firstName lastName specialty")
-            .populate("pet", "name species")
-            .sort({ date: 1, time: 1 });
+            .populate("pet", "name")
+            .sort({ date: 1, time: 1, type: 1, details: 1});
 
         return appointments;
     };
 
         // Obtener historial de turnos del owner
-    async getAppointmentsHistory({ ownerId, status }) {
+    async getAppointmentsHistory({ ownerId, status, petId }) {
         const filter = { owner: ownerId };
+        if (petId) filter.pet = petId;
 
         // filtro por estado
         if (status) {
@@ -320,8 +322,8 @@ export class appointmentService {
         
         const history = await Turno.find(filter)
             .populate("vet", "firstName lastName specialty")
-            .populate("pet", "name species")
-            .sort({ date: 1, time: 1 });
+            .populate("pet", "name")
+            .sort({ date: -1, time: 1 });
 
         return history;
     };
@@ -343,5 +345,21 @@ export class appointmentService {
 
         return availabilityBlock;
     }
+
+    async getAvailableDatesByVet(vetId) {
+        const blocks = await BloqueDisponible.find({
+            vet: vetId,
+            available: true,
+            date: { $gte: new Date() }
+        });
+
+        const uniqueDates = [
+            ...new Set(
+            blocks.map(b => b.date.toISOString().split("T")[0])
+            )
+        ];
+
+        return uniqueDates;
+    };
 };
 

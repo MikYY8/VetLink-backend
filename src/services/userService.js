@@ -56,7 +56,7 @@ export class userService {
 
             return { accesstoken, refreshtoken };
         }catch(error) {
-            throw new Error(error);
+            throw new Error(error.message);
         };
     };
 

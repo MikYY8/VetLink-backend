@@ -15,7 +15,7 @@ import upload from "../middlewares/upload.js";
 const userRouter = express.Router();
 
 // Login usuario (OWNER, SECRETARY, ADMIN)
-userRouter.post("/login", loginValidation, validationMiddleware, loginController);
+userRouter.post("/login", loginController);
 
 // Renovar token 
 userRouter.post("/token", renovateTokenController);
