@@ -64,7 +64,7 @@ export const loginController = async (req, res) => {
         // console.log("BODY 2do intento:", req.body);
         const { email, password } = req.body;
         
-        const { accesstoken, refreshtoken } = await us.login(email, password);
+        const { accesstoken, refreshtoken, role } = await us.login(email, password);
         res.set({
             Authorization: `Bearer ${accesstoken}`,
             "x-refresh-token": refreshtoken,
@@ -72,7 +72,7 @@ export const loginController = async (req, res) => {
         res.status(200).json({
             message: "success",
             code: 200,
-            data: { accesstoken, refreshtoken },
+            data: { accesstoken, refreshtoken, role },
         });
     } catch (error) {
         res.status(401).json(error.message);

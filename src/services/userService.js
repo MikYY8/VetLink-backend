@@ -37,11 +37,11 @@ export class userService {
                 account = await Veterinario.findOne({ email });
             };
             if (!account) {
-                throw new Error("No se encontró el usuario 44444");
+                throw new Error("No se encontró el usuario");
             };
             const passwordValid = await bcrypt.compare(password, account.password);
             if (!passwordValid) {
-                throw new Error("Email o contraseña incorrectos 555555");
+                throw new Error("Email o contraseña incorrectos");
             };
             const accesstoken = generateAccessToken({
                 id: account._id,
@@ -54,7 +54,7 @@ export class userService {
                 role: account.role,
             });
 
-            return { accesstoken, refreshtoken };
+            return { accesstoken, refreshtoken, role: account.role };
         }catch(error) {
             throw new Error(error.message);
         };

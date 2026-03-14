@@ -48,7 +48,7 @@ appointmentRouter.get("/vet-agenda/today", authMiddleware, authRolesMiddleware([
 appointmentRouter.get("/dashboard", authMiddleware, authRolesMiddleware(["SECRETARY", "ADMIN"]), getDashboardController)
 
 // Ver detalles de un turno
-appointmentRouter.get("/dashboard/details/:appointmentId", authMiddleware, authRolesMiddleware(["SECRETARY", "ADMIN"]), getAppointmentDetailsController)
+appointmentRouter.get("/dashboard/details/:appointmentId", authMiddleware, authRolesMiddleware(["VET", "SECRETARY", "ADMIN"]), getAppointmentDetailsController)
 
 // Crear turno (PARA OWNERS / SECRETARIES / ADMINS)
 appointmentRouter.post("/make-appointment", authMiddleware, authRolesMiddleware(["OWNER", "SECRETARY", "ADMIN"]), createAppointmentController);
