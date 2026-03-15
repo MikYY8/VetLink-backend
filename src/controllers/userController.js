@@ -9,7 +9,7 @@ const us = new userService();
     // REGISTRO DE USUARIOS (SECRETARY, ADMIN)
 export const registerUserController = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, role } = req.body; 
+    const { firstName, lastName, dni, email, password, role } = req.body; 
 
         // BLOQUEO DE ROLES
     if (req.user.role === "SECRETARY" && role === "ADMIN") {
@@ -17,7 +17,7 @@ export const registerUserController = async (req, res) => {
         message: "No tenés permisos para crear administradores",
       });
     }else{
-        const newUser = await us.registerUser(firstName, lastName, email, password, role);
+        const newUser = await us.registerUser(firstName, lastName, dni, email, password, role);
         
         res.status(201).json({
         message: "Success",
@@ -34,7 +34,7 @@ export const registerUserController = async (req, res) => {
     // REGISTRO DE VETERINARIOS (SECRETARY, ADMIN)
 export const registerVetController = async (req, res) => {
     try{
-        const { firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule } = req.body;
+        const { firstName, lastName, dni, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule } = req.body;
         let photoUrl = null;
         
         if(req.file){
@@ -45,7 +45,7 @@ export const registerVetController = async (req, res) => {
         let parsedWorkSchedule = workSchedule;
         if (workSchedule) {parsedWorkSchedule = JSON.parse(workSchedule)};
 
-        const newVet = await us.registerVet(firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, parsedWorkSchedule, photoUrl);
+        const newVet = await us.registerVet(firstName, lastName, dni, email, password, licenseNumber, specialty, acceptsConsultations, phone, parsedWorkSchedule, photoUrl);
         
         res.status(201).json({
           message: "Success",
@@ -207,7 +207,7 @@ export const getUserByIdController = async (req, res) => {
   try {
     const { ownerId } = req.params;
 
-    const user = await Usuario.findById(ownerId).select("firstName lastName email role");
+    const user = await Usuario.findById(ownerId).select("firstName lastName dni email role");
 
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
@@ -227,7 +227,7 @@ export const getVetByIdController = async (req, res) => {
   try {
     const { vetId } = req.params;
 
-    const vet = await Veterinario.findById(vetId).select("firstName lastName email licenseNumber specialty acceptsConsultations phone workSchedule");
+    const vet = await Veterinario.findById(vetId).select("firstName lastName dni email licenseNumber specialty acceptsConsultations phone workSchedule");
 
     if (!vet) {
       return res.status(404).json({ message: "Usuario no encontrado" });

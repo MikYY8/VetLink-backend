@@ -7,24 +7,29 @@ import Veterinario from "../models/vetModel.js";
 export class userService {
 
         // REGISTRAR USUARIO 
-    async registerUser (firstName, lastName, email, password, role) {
+    async registerUser (firstName, lastName, dni, email, password, role) {
         const existingUser = await Usuario.findOne({ email });
         if(existingUser){
             throw new Error("E-mail ya registrado");
         };
 
-        const newUser = await Usuario.create({firstName, lastName, email, password, role});
+        const existingUserDNI = await Usuario.findOne({ dni });
+        if(existingUserDNI){
+            throw new Error("DNI ya registrado");
+        };
+
+        const newUser = await Usuario.create({firstName, lastName, dni, email, password, role});
         return newUser;
     };
 
         // REGISTRAR VETERINARIO
-    async registerVet (firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl){
+    async registerVet (firstName, lastName, dni, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl){
         const existingVet = await Veterinario.findOne({ email });
         if(existingVet){
             throw new Error("E-mail ya registrado");
         };
 
-        const newVet = await Veterinario.create({ firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl })
+        const newVet = await Veterinario.create({ firstName, lastName, dni, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl })
         
         return newVet;
     };

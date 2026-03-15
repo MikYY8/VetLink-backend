@@ -46,13 +46,13 @@ userRouter.put("/update-user/:ownerId", authMiddleware, authRolesMiddleware(["OW
 userRouter.get("/get-user/:ownerId", authMiddleware, authRolesMiddleware(["OWNER", "ADMIN", "SECRETARY"]), getUserByIdController);
 
 // Obtener un veterinario por id (para editar)
-userRouter.get("/get-vet/:vetId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getVetByIdController);
+userRouter.get("/get-vet/:vetId", authMiddleware, authRolesMiddleware(["VET", "ADMIN", "SECRETARY"]), getVetByIdController);
 
 // Eliminar un usuario
 userRouter.delete("/delete-user/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), deleteUserController)
 
 // Editar un vet
-userRouter.put("/update-vet/:vetId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), updateVetController)
+userRouter.put("/update-vet/:vetId", authMiddleware, authRolesMiddleware(["VET", "ADMIN", "SECRETARY"]), updateVetController)
 
 // Eliminar un vet
 userRouter.delete("/delete-vet/:vetId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), deleteVetController)

@@ -12,6 +12,11 @@ const userSchema = new mongoose.Schema({
         required:true,
         trim: true,
     },
+    dni:{
+      type:Number,
+      required:true,
+      unique:true,
+    },
     email: {
         type: String,
         required: true,
