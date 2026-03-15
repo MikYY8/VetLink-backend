@@ -279,7 +279,7 @@ export class appointmentService {
             .populate("vet", "firstName lastName")
             .populate("owner", "firstName lastName")
             .populate("pet", "name species")
-            .sort({ date: 1, time: 1 });
+            .sort({ date: -1, time: 1 });
 
         return appointments;
     };
