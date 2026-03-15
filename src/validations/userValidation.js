@@ -19,8 +19,8 @@ export const registerValidation = [
 // VALIDACIÓN DE LOGIN
 export const loginValidation = [
     check("email")
-        // .isEmail().withMessage("Email o contraseña incorrectos1")
-    //     .notEmpty().withMessage("Email o contraseña incorrectos2"),
-    // check("password")
-    //     .notEmpty().withMessage("Email o contraseña incorrectos3"),
+        .isEmail().withMessage("Email o contraseña incorrectos1")
+        .notEmpty().withMessage("Email o contraseña incorrectos2"),
+    check("password")
+        .notEmpty().withMessage("Email o contraseña incorrectos3"),
 ];

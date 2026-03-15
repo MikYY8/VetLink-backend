@@ -98,17 +98,18 @@ export const getVetAgendaController = async (req, res) => {
   // OBETENER AGENDA DIARIA DEL VET más compacta, solo los de hoy y mañana
 export const getVetDailyAgendaController = async (req, res) => {
   try{
-    const vetId = req.user.id;   // id del token
-    const today = new Date();    // trae la fecha de hoy
-    today.setHours(0,0,0,0);     // la establece al primer segundo del dia
-    const tomorrow = new Date(today);  // la fecha de mañana es hoy ...
-    tomorrow.setDate(today.getDate() + 1);  // ... más uno, igual a mañana
+    const vetId = req.user.id;
+    const today = new Date();
+    const start = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+
+    const end = new Date(start);
+    end.setUTCDate(start.getUTCDate() + 1);
 
     const agenda = await as.getVetAgenda({
       vetId,
-      from: today,
-      to: tomorrow,
-      status: "SCHEDULED",
+      from: start,
+      to: end,
+      // status: "SCHEDULED",
     });
 
     res.status(200).json({

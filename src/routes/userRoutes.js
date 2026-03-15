@@ -15,7 +15,7 @@ import upload from "../middlewares/upload.js";
 const userRouter = express.Router();
 
 // Login usuario (OWNER, SECRETARY, ADMIN)
-userRouter.post("/login", loginController);
+userRouter.post("/login", loginValidation, loginController);
 
 // Renovar token 
 userRouter.post("/token", renovateTokenController);
@@ -40,19 +40,19 @@ userRouter.get("/allusers", authMiddleware, authRolesMiddleware(["ADMIN", "SECRE
 userRouter.get("/allvets", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getAllVetsController);
 
 // Editar un usuario
-userRouter.put("/update-user/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), updateUserController)
+userRouter.put("/update-user/:ownerId", authMiddleware, authRolesMiddleware(["OWNER", "ADMIN", "SECRETARY"]), updateUserController)
 
 // Obtener un usuario por id (para editar)
-userRouter.get("/get-user/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getUserByIdController);
+userRouter.get("/get-user/:ownerId", authMiddleware, authRolesMiddleware(["OWNER", "ADMIN", "SECRETARY"]), getUserByIdController);
 
 // Obtener un veterinario por id (para editar)
-userRouter.get("/get-vet/:vetId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), getVetByIdController);
+userRouter.get("/get-vet/:vetId", authMiddleware, authRolesMiddleware(["VET", "ADMIN", "SECRETARY"]), getVetByIdController);
 
 // Eliminar un usuario
 userRouter.delete("/delete-user/:ownerId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), deleteUserController)
 
 // Editar un vet
-userRouter.put("/update-vet/:vetId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), updateVetController)
+userRouter.put("/update-vet/:vetId", authMiddleware, authRolesMiddleware(["VET", "ADMIN", "SECRETARY"]), updateVetController)
 
 // Eliminar un vet
 userRouter.delete("/delete-vet/:vetId", authMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY"]), deleteVetController)

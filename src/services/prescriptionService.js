@@ -20,8 +20,8 @@ export class prescriptionService {
 
         if (appointment.vet.toString() !== vetId) throw new Error("No autorizado para este turno");
 
-        const existingPrescription = await Turno.findOne({ appointment: appointmentId });
-        if (existingPrescription) throw new Error("Este turno ya tiene una receta")
+        // const existingPrescription = await Turno.findOne({ appointment: appointmentId });
+        // if (existingPrescription) throw new Error("Este turno ya tiene una receta")
 
         const prescription = await Receta.create({
             appointment: appointmentId,

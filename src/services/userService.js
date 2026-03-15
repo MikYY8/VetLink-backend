@@ -7,24 +7,29 @@ import Veterinario from "../models/vetModel.js";
 export class userService {
 
         // REGISTRAR USUARIO 
-    async registerUser (firstName, lastName, email, password, role) {
+    async registerUser (firstName, lastName, dni, email, password, role) {
         const existingUser = await Usuario.findOne({ email });
         if(existingUser){
             throw new Error("E-mail ya registrado");
         };
 
-        const newUser = await Usuario.create({firstName, lastName, email, password, role});
+        const existingUserDNI = await Usuario.findOne({ dni });
+        if(existingUserDNI){
+            throw new Error("DNI ya registrado");
+        };
+
+        const newUser = await Usuario.create({firstName, lastName, dni, email, password, role});
         return newUser;
     };
 
         // REGISTRAR VETERINARIO
-    async registerVet (firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl){
+    async registerVet (firstName, lastName, dni, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl){
         const existingVet = await Veterinario.findOne({ email });
         if(existingVet){
             throw new Error("E-mail ya registrado");
         };
 
-        const newVet = await Veterinario.create({ firstName, lastName, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl })
+        const newVet = await Veterinario.create({ firstName, lastName, dni, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl })
         
         return newVet;
     };
@@ -37,11 +42,11 @@ export class userService {
                 account = await Veterinario.findOne({ email });
             };
             if (!account) {
-                throw new Error("No se encontró el usuario 44444");
+                throw new Error("No se encontró el usuario");
             };
             const passwordValid = await bcrypt.compare(password, account.password);
             if (!passwordValid) {
-                throw new Error("Email o contraseña incorrectos 555555");
+                throw new Error("Email o contraseña incorrectos");
             };
             const accesstoken = generateAccessToken({
                 id: account._id,
@@ -54,7 +59,7 @@ export class userService {
                 role: account.role,
             });
 
-            return { accesstoken, refreshtoken };
+            return { accesstoken, refreshtoken, role: account.role };
         }catch(error) {
             throw new Error(error.message);
         };

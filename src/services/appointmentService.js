@@ -279,13 +279,16 @@ export class appointmentService {
             .populate("vet", "firstName lastName")
             .populate("owner", "firstName lastName")
             .populate("pet", "name species")
-            .sort({ date: 1, time: 1 });
+            .sort({ date: -1, time: 1 });
 
         return appointments;
     };
 
     async getAppointmentDetails(appointmentId) {
-        const appointment = await Turno.findById(appointmentId,{details:1,price:1})
+        const appointment = await Turno.findById(appointmentId)
+        .populate("pet","name species")
+        .populate("owner","firstName lastName")
+        .select("date time type details");
 
         if (!appointment) throw new Error("Turno no encontrado");
 
