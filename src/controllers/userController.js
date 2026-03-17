@@ -34,18 +34,26 @@ export const registerUserController = async (req, res) => {
     // REGISTRO DE VETERINARIOS (SECRETARY, ADMIN)
 export const registerVetController = async (req, res) => {
     try{
-        const { firstName, lastName, dni, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule } = req.body;
-        let photoUrl = null;
+        const { firstName, lastName, dni, email, 
+            password, licenseNumber, specialty, 
+            // acceptsConsultations, phone, 
+            workSchedule } = req.body;
+        // let photoUrl = null;
         
-        if(req.file){
-            const result = await cloudinary.uploader.upload(req.file.path);
-            photoUrl = result.secure_url;
-        };
+        // if(req.file){
+        //     const result = await cloudinary.uploader.upload(req.file.path);
+        //     photoUrl = result.secure_url;
+        // };
 
         let parsedWorkSchedule = workSchedule;
         if (workSchedule) {parsedWorkSchedule = JSON.parse(workSchedule)};
 
-        const newVet = await us.registerVet(firstName, lastName, dni, email, password, licenseNumber, specialty, acceptsConsultations, phone, parsedWorkSchedule, photoUrl);
+        const newVet = await us.registerVet(firstName, lastName, dni, email, password, 
+            licenseNumber, specialty, 
+            // acceptsConsultations, phone, 
+            parsedWorkSchedule, 
+            // photoUrl
+        );
         
         res.status(201).json({
           message: "Success",

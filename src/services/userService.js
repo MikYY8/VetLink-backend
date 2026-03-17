@@ -23,13 +23,23 @@ export class userService {
     };
 
         // REGISTRAR VETERINARIO
-    async registerVet (firstName, lastName, dni, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl){
+    async registerVet (firstName, lastName, dni, email, 
+        password, licenseNumber, specialty, 
+        // acceptsConsultations, phone, 
+        workSchedule, 
+        // photoUrl
+        ){
         const existingVet = await Veterinario.findOne({ email });
         if(existingVet){
             throw new Error("E-mail ya registrado");
         };
 
-        const newVet = await Veterinario.create({ firstName, lastName, dni, email, password, licenseNumber, specialty, acceptsConsultations, phone, workSchedule, photoUrl })
+        const newVet = await Veterinario.create({ firstName, lastName, dni, email, 
+            password, licenseNumber, specialty,
+            //  acceptsConsultations, phone, 
+             workSchedule, 
+            //  photoUrl 
+            })
         
         return newVet;
     };

@@ -26,9 +26,9 @@ export const updateVetProfile = async (req, res) => {
         const vetId = req.user.id;
         const allowedFields = [
             "specialty",
-            "acceptsConsultations",
-            "phone",
-            "photoUrl",
+            // "acceptsConsultations",
+            // "phone",
+            // "photoUrl",
             "workSchedule",
         ];
         const updates = {};
