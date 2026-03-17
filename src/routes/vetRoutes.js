@@ -4,7 +4,7 @@ import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { authRolesMiddleware } from "../middlewares/authRolesMiddleware.js";
 import { authVetMiddleware } from "../middlewares/authVetMiddleware.js";
 
-const router = express.Router();
+const router = express.Router();  // TODO ESTO ESTÁ EN DESUSO
 
 // Veterinario puede ver su perfil
 router.get("/me", authMiddleware, authVetMiddleware, authRolesMiddleware(["ADMIN", "SECRETARY", "VET"]), getVetProfile);
