@@ -97,7 +97,8 @@ export const updatePetController = async (req, res) => {
     const updatedPet = await ps.updatePet(
       petId,
       updateData,
-      user
+      user,
+      photoUrl
     );
 
     res.status(200).json({
