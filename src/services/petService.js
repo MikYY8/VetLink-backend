@@ -23,7 +23,7 @@ export class petService {
     };
 
         // EDITAR MASCOTA
-    async updatePet(petId, updateData, user) {
+    async updatePet(petId, updateData, user, photoUrl) {
         const pet = await Mascota.findById(petId);
 
         if (!pet) throw new Error("Mascota no encontrada");
@@ -34,6 +34,11 @@ export class petService {
         };
 
         Object.assign(pet, updateData);
+
+        if (photoUrl) {
+            pet.photoUrl = photoUrl;
+        }
+
         await pet.save();
         return pet;
     };
