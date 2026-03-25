@@ -77,4 +77,4 @@ src/
 
 ---
 
-**Autor:** MikYY8
+**Creado por:** MikYY8
