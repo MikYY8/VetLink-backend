@@ -250,30 +250,46 @@ export class appointmentService {
         };
     };
 
-        // Dashboard de secretaria
     async getDashboard({ date, from, to, vetId, status }) {
         const filter = {};
 
-        // filtro por vet
-        if (vetId) filter.vet = vetId;
+        // SI NO HAY FILTROS → HOY
+        if (!vetId && !date && !from && !to) {
+            const today = new Date();
 
-        // filtro por estado
-        if (status) filter.status = status.trim();
-        
-        // filtro por fecha exacta
+            const start = new Date(Date.UTC(
+                today.getFullYear(),
+                today.getMonth(),
+                today.getDate()
+            ));
+
+            const end = new Date(start);
+            end.setUTCDate(start.getUTCDate() + 1);
+
+            filter.date = { $gte: start, $lt: end };
+        }
+
+        // FECHA EXACTA
         if (date) {
             const start = new Date(`${date}T00:00:00`);
             const end = new Date(`${date}T23:59:59.999`);
+
             filter.date = { $gte: start, $lte: end };
         }
 
-        // filtro por rango
+        // RANGO
         if (from || to) {
             filter.date = {};
 
             if (from) filter.date.$gte = new Date(`${from}T00:00:00`);
             if (to) filter.date.$lte = new Date(`${to}T23:59:59.999`);
         }
+
+        // VET
+        if (vetId) filter.vet = vetId;
+
+        // STATUS
+        if (status) filter.status = status.trim();
 
         const appointments = await Turno.find(filter)
             .populate("vet", "firstName lastName")
@@ -282,7 +298,7 @@ export class appointmentService {
             .sort({ date: -1, time: 1 });
 
         return appointments;
-    };
+    }
 
     async getAppointmentDetails(appointmentId) {
         const appointment = await Turno.findById(appointmentId)

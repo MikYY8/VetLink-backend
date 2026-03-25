@@ -142,17 +142,22 @@ export const updateAppointmentStatusController = async (req, res) => {
 
   // DASHBOARD DE SECRETARIA con todos los turnos
 export const getDashboardController = async (req, res) => {
-
-  try{
+  try {
     const { date, from, to, vetId, status } = req.query;
 
-    const dashboard = await as.getDashboard({ date, from, to, vetId, status });
+    const dashboard = await as.getDashboard({ 
+      date,
+      from,
+      to,
+      vetId,
+      status
+    });
 
     res.status(200).json({
       message: "Dashboard de turnos",
       data: dashboard,
     });
-  }catch(error){
+  } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
